@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
+import '../../config/game_data.dart';
 
 class ConnectionsScreen extends StatefulWidget {
   final bool isBirthdayMode;
@@ -11,82 +11,6 @@ class ConnectionsScreen extends StatefulWidget {
 }
 
 class _ConnectionsScreenState extends State<ConnectionsScreen> {
-  // Each puzzle has exactly 4 groups of 4 words = 16 words
-  final List<Map<String, dynamic>> puzzles = [
-    {
-      'groups': [
-        {
-          'name': 'Fruits',
-          'items': ['APPLE', 'BANANA', 'CHERRY', 'GRAPE'],
-          'color': const Color(0xFFFBC02D),
-        },
-        {
-          'name': 'Planets',
-          'items': ['MARS', 'VENUS', 'SATURN', 'PLUTO'],
-          'color': const Color(0xFF66BB6A),
-        },
-        {
-          'name': 'Colors',
-          'items': ['SCARLET', 'INDIGO', 'AMBER', 'IVORY'],
-          'color': const Color(0xFF42A5F5),
-        },
-        {
-          'name': 'Card Games',
-          'items': ['POKER', 'BRIDGE', 'HEARTS', 'SPADES'],
-          'color': const Color(0xFFAB47BC),
-        },
-      ],
-    },
-    {
-      'groups': [
-        {
-          'name': 'Dog Breeds',
-          'items': ['POODLE', 'BEAGLE', 'HUSKY', 'CORGI'],
-          'color': const Color(0xFFFBC02D),
-        },
-        {
-          'name': 'Instruments',
-          'items': ['PIANO', 'VIOLIN', 'DRUMS', 'FLUTE'],
-          'color': const Color(0xFF66BB6A),
-        },
-        {
-          'name': 'Weather',
-          'items': ['STORM', 'BREEZE', 'FROST', 'HAIL'],
-          'color': const Color(0xFF42A5F5),
-        },
-        {
-          'name': 'Dances',
-          'items': ['WALTZ', 'SALSA', 'TANGO', 'SWING'],
-          'color': const Color(0xFFAB47BC),
-        },
-      ],
-    },
-    {
-      'groups': [
-        {
-          'name': 'Gems',
-          'items': ['RUBY', 'PEARL', 'OPAL', 'TOPAZ'],
-          'color': const Color(0xFFFBC02D),
-        },
-        {
-          'name': 'Trees',
-          'items': ['MAPLE', 'CEDAR', 'BIRCH', 'WILLOW'],
-          'color': const Color(0xFF66BB6A),
-        },
-        {
-          'name': 'Pasta',
-          'items': ['PENNE', 'ORZO', 'ROTINI', 'ZITI'],
-          'color': const Color(0xFF42A5F5),
-        },
-        {
-          'name': 'Fabrics',
-          'items': ['SILK', 'DENIM', 'LINEN', 'SUEDE'],
-          'color': const Color(0xFFAB47BC),
-        },
-      ],
-    },
-  ];
-
   late List<Map<String, dynamic>> currentGroups;
   late List<String> remainingWords;
   Set<String> selectedItems = {};
@@ -102,10 +26,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
   }
 
   void _initializeGame() {
-    final puzzle = puzzles[Random().nextInt(puzzles.length)];
-    currentGroups = List<Map<String, dynamic>>.from(
-      (puzzle['groups'] as List).map((g) => Map<String, dynamic>.from(g)),
-    );
+    currentGroups = GameData.getConnectionsPuzzle(widget.isBirthdayMode);
     remainingWords = [];
     for (final group in currentGroups) {
       remainingWords.addAll(List<String>.from(group['items']));
@@ -180,13 +101,17 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Dark purple/orange palette
-    const bgGradientTop = Color(0xFF1A0A2E);
-    const bgGradientBottom = Color(0xFF2D1B4E);
-    const accentOrange = Color(0xFFFF8C42);
-    const accentRose = Color(0xFFFB7185);
-    const tileBase = Color(0xFF3B1F6E);
-    const tileSelected = Color(0xFFFF8C42);
+    // Mode-aware palette
+    final isBday = widget.isBirthdayMode;
+    final bgGradientTop = isBday ? const Color(0xFF1A0A2E) : const Color(0xFFFAF5FF);
+    final bgGradientBottom = isBday ? const Color(0xFF2D1B4E) : const Color(0xFFF3E8FF);
+    final accentOrange = isBday ? const Color(0xFFFF8C42) : const Color(0xFFFFA500);
+    final accentRose = isBday ? const Color(0xFFFB7185) : const Color(0xFFFF6B6B);
+    final tileBase = isBday ? const Color(0xFF3B1F6E) : const Color(0xFFE9D5FF);
+    final tileSelected = isBday ? const Color(0xFFFF8C42) : const Color(0xFFFFA500);
+    final textPrimary = isBday ? Colors.white : const Color(0xFF2D1B4E);
+    final textMuted = isBday ? Colors.white54 : Colors.purple.shade300;
+    final borderFaint = isBday ? Colors.white.withOpacity(0.08) : Colors.purple.withOpacity(0.12);
 
     return Scaffold(
       appBar: AppBar(
@@ -194,10 +119,12 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
         automaticallyImplyLeading: true,
         elevation: 0,
         backgroundColor: bgGradientTop,
-        iconTheme: const IconThemeData(color: Colors.white70),
+        iconTheme: IconThemeData(
+          color: isBday ? Colors.white70 : Colors.purple.shade400,
+        ),
       ),
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -222,12 +149,12 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                       decoration: BoxDecoration(
                         color: selectedItems.isNotEmpty
                             ? accentOrange.withOpacity(0.2)
-                            : Colors.white10,
+                            : (isBday ? Colors.white10 : Colors.purple.shade50),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
                           color: selectedItems.isNotEmpty
                               ? accentOrange
-                              : Colors.white24,
+                              : (isBday ? Colors.white24 : Colors.purple.shade200),
                         ),
                       ),
                       child: Text(
@@ -235,7 +162,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                         style: TextStyle(
                           color: selectedItems.isNotEmpty
                               ? accentOrange
-                              : Colors.white54,
+                              : textMuted,
                           fontWeight: FontWeight.w600,
                           fontSize: 13,
                         ),
@@ -252,7 +179,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                                 : Icons.favorite_border_rounded,
                             color: i < mistakesLeft
                                 ? accentRose
-                                : Colors.white24,
+                                : (isBday ? Colors.white24 : Colors.purple.shade200),
                             size: 22,
                           ),
                         );
@@ -373,12 +300,10 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                                             ),
                                             border: Border.all(
                                               color: isSelected
-                                                  ? Colors.white.withOpacity(
-                                                      0.6,
-                                                    )
-                                                  : Colors.white.withOpacity(
-                                                      0.08,
-                                                    ),
+                                                  ? (isBday
+                                                      ? Colors.white.withOpacity(0.6)
+                                                      : Colors.orange.shade700)
+                                                  : borderFaint,
                                               width: isSelected ? 2.0 : 1.0,
                                             ),
                                             boxShadow: isSelected
@@ -432,7 +357,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                                                       letterSpacing: 0.5,
                                                       color: isSelected
                                                           ? Colors.white
-                                                          : Colors.white
+                                                          : textPrimary
                                                                 .withOpacity(
                                                                   0.75,
                                                                 ),
@@ -473,10 +398,10 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: accentOrange,
                               foregroundColor: Colors.white,
-                              disabledBackgroundColor: Colors.white.withOpacity(
-                                0.08,
-                              ),
-                              disabledForegroundColor: Colors.white38,
+                              disabledBackgroundColor: isBday
+                                  ? Colors.white.withOpacity(0.08)
+                                  : Colors.purple.withOpacity(0.08),
+                              disabledForegroundColor: textMuted,
                               shape: const StadiumBorder(),
                               padding: const EdgeInsets.symmetric(vertical: 14),
                               textStyle: const TextStyle(
@@ -494,7 +419,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                         TextButton(
                           onPressed: _deselectAll,
                           style: TextButton.styleFrom(
-                            foregroundColor: Colors.white54,
+                            foregroundColor: textMuted,
                             textStyle: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
@@ -518,7 +443,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.w900,
-                            color: accentOrange,
+                            color: Color(0xFFFFA500),
                           ),
                         ),
                         const SizedBox(height: 18),
@@ -551,13 +476,13 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.w800,
-                            color: accentRose,
+                            color: Color(0xFFFF6B6B),
                           ),
                         ),
                         const SizedBox(height: 6),
-                        const Text(
+                        Text(
                           'The groups are shown above',
-                          style: TextStyle(fontSize: 13, color: Colors.white38),
+                          style: TextStyle(fontSize: 13, color: textMuted),
                         ),
                         const SizedBox(height: 18),
                         ElevatedButton.icon(

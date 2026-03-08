@@ -96,18 +96,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // ── Formatting helpers ──
-
-  String _fmtCountdown(Duration d) {
-    if (d.inDays > 0) {
-      return '${d.inDays}d ${d.inHours.remainder(24)}h';
-    }
-    final h = d.inHours.remainder(24).toString().padLeft(2, '0');
-    final m = d.inMinutes.remainder(60).toString().padLeft(2, '0');
-    final s = d.inSeconds.remainder(60).toString().padLeft(2, '0');
-    return '$h:$m:$s';
-  }
-
   // ── Build ──
 
   @override
@@ -153,42 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     const Spacer(),
 
-                    // Countdown / expiry timer (always visible for admins + birthday person)
-                    if (_isAdmin || _isBirthdayPerson) ...[
-                      _Pill(
-                        dark: isBDay,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                _isBirthdayToday ? Icons.timer : Icons.cake,
-                                size: 16,
-                                color: isBDay
-                                    ? AppTheme.birthdayTextAccent
-                                    : AppTheme.normalBluePrimary,
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                _isBirthdayToday
-                                    ? _fmtCountdown(_remaining)
-                                    : '${_remaining.inDays}d',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: isBDay ? Colors.white : Colors.black87,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                    ],
+
 
                     // Mode toggle (admins only, not birthday person on their day)
                     if (_canToggle)

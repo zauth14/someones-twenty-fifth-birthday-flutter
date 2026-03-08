@@ -4,7 +4,6 @@ import '../config/app_theme.dart';
 import 'games/wordle.dart';
 import 'games/connections.dart';
 import 'games/wavelength.dart';
-import 'games/buzzfeed_quiz.dart';
 import 'games/quiz_time.dart';
 
 class GameHubScreen extends StatelessWidget {
@@ -39,39 +38,32 @@ class GameHubScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final games = [
       {
-        'name': 'Personality Quiz',
-        'emoji': '💭',
-        'description': 'Fun quizzes about you',
-        'screen': TenThingsScreen(isBirthdayMode: false),
-        'color': AppTheme.normalBluePrimary,
-      },
-      {
         'name': '5-Letter Challenge',
         'emoji': '🔤',
         'description': 'Guess the word in 6 tries',
         'screen': const WordleScreen(isBirthdayMode: false),
-        'color': AppTheme.normalGreenPrimary,
+        'color': AppTheme.normalOrangePrimary,
       },
       {
         'name': 'Spectrum Game',
         'emoji': '〰️',
         'description': 'Place concepts on a scale',
         'screen': const WavelengthScreen(isBirthdayMode: false),
-        'color': AppTheme.normalAccent,
+        'color': AppTheme.normalPurpleDark,
       },
       {
         'name': 'Category Match',
         'emoji': '🔗',
         'description': 'Find groups of four',
         'screen': const ConnectionsScreen(isBirthdayMode: false),
-        'color': const Color(0xFFEC4899),
+        'color': AppTheme.normalOrangeDark,
       },
       {
         'name': 'Quiz Time',
         'emoji': '🧠',
         'description': 'Fun personality quizzes',
         'screen': const QuizTimeScreen(isBirthdayMode: false),
-        'color': const Color(0xFFFF8C42),
+        'color': AppTheme.normalAccent,
       },
     ];
 

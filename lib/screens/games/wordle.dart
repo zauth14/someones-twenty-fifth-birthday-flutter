@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'dart:math';
+import '../../config/game_data.dart';
 
 class WordleScreen extends StatefulWidget {
   final bool isBirthdayMode;
@@ -13,18 +13,6 @@ class WordleScreen extends StatefulWidget {
 
 class _WordleScreenState extends State<WordleScreen> {
   static const int wordLength = 5;
-  static const List<String> wordList = [
-    'PARTY',
-    'HAPPY',
-    'GAMES',
-    'SWEET',
-    'DANCE',
-    'LIGHT',
-    'SHINE',
-    'SMILE',
-    'TOAST',
-    'CHARM',
-  ];
 
   late String secretWord;
   List<String> guesses = [];
@@ -41,7 +29,7 @@ class _WordleScreenState extends State<WordleScreen> {
   }
 
   void _initializeGame() {
-    secretWord = wordList[Random().nextInt(wordList.length)];
+    secretWord = GameData.getWordleWord(widget.isBirthdayMode);
     guesses = [];
     currentGuess = '';
     _guessController.clear();
@@ -75,19 +63,28 @@ class _WordleScreenState extends State<WordleScreen> {
     if (letter == secretLetter) {
       return const Color(0xFF22C55E); // green = correct
     } else if (secretWord.contains(letter)) {
-      return const Color(0xFFFF8C42); // orange = in word
+      return widget.isBirthdayMode
+          ? const Color(0xFFFF8C42)  // dark orange for birthday
+          : const Color(0xFFFFA500); // light orange for normal
     } else {
-      return const Color(0xFF2D1B4E); // dark plum = not in word
+      return widget.isBirthdayMode
+          ? const Color(0xFF2D1B4E)  // dark plum for birthday
+          : const Color(0xFFE9D5FF); // light purple for normal
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    const bgTop = Color(0xFF1A0A2E);
-    const bgBottom = Color(0xFF2D1B4E);
-    const accentOrange = Color(0xFFFF8C42);
-    const accentRose = Color(0xFFFB7185);
-    const tileBase = Color(0xFF3B1F6E);
+    final isBday = widget.isBirthdayMode;
+    final bgTop = isBday ? const Color(0xFF1A0A2E) : const Color(0xFFFAF5FF);
+    final bgBottom = isBday ? const Color(0xFF2D1B4E) : const Color(0xFFF3E8FF);
+    final accentOrange = isBday ? const Color(0xFFFF8C42) : const Color(0xFFFFA500);
+    final accentRose = isBday ? const Color(0xFFFB7185) : const Color(0xFFFF6B6B);
+    final tileBase = isBday ? const Color(0xFF3B1F6E) : const Color(0xFFE9D5FF);
+    final textPrimary = isBday ? Colors.white : const Color(0xFF2D1B4E);
+    final textMuted = isBday ? Colors.white54 : const Color(0xFF9775C7);
+    final textFaint = isBday ? Colors.white24 : Colors.purple.shade200;
+    final borderFaint = isBday ? Colors.white.withOpacity(0.08) : Colors.purple.withOpacity(0.12);
 
     return Scaffold(
       appBar: AppBar(
@@ -95,10 +92,12 @@ class _WordleScreenState extends State<WordleScreen> {
         automaticallyImplyLeading: true,
         elevation: 0,
         backgroundColor: bgTop,
-        iconTheme: const IconThemeData(color: Colors.white70),
+        iconTheme: IconThemeData(
+          color: isBday ? Colors.white70 : Colors.purple.shade400,
+        ),
       ),
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -116,7 +115,7 @@ class _WordleScreenState extends State<WordleScreen> {
                     if (gameWon)
                       Column(
                         children: [
-                          const Text(
+                          Text(
                             '✨ Cracked it!',
                             style: TextStyle(
                               fontSize: 30,
@@ -146,7 +145,7 @@ class _WordleScreenState extends State<WordleScreen> {
                         children: [
                           Text(
                             '💔 The word was: $secretWord',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w800,
                               color: accentRose,
@@ -176,10 +175,10 @@ class _WordleScreenState extends State<WordleScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Text(
+                              Text(
                                 'Tries left  ',
                                 style: TextStyle(
-                                  color: Colors.white54,
+                                  color: textMuted,
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -195,7 +194,7 @@ class _WordleScreenState extends State<WordleScreen> {
                                         : Icons.circle_outlined,
                                     color: i < attemptsLeft
                                         ? accentOrange
-                                        : Colors.white24,
+                                        : textFaint,
                                     size: 12,
                                   ),
                                 );
@@ -245,7 +244,7 @@ class _WordleScreenState extends State<WordleScreen> {
                                               row == guesses.length &&
                                                   col == guess.length
                                               ? accentOrange.withOpacity(0.6)
-                                              : Colors.white.withOpacity(0.08),
+                                              : borderFaint,
                                           width:
                                               row == guesses.length &&
                                                   col == guess.length
@@ -268,7 +267,7 @@ class _WordleScreenState extends State<WordleScreen> {
                                           style: TextStyle(
                                             color: row < guesses.length
                                                 ? Colors.white
-                                                : Colors.white.withOpacity(0.7),
+                                                : textPrimary.withOpacity(0.7),
                                             fontWeight: FontWeight.w800,
                                             fontSize: 22,
                                             letterSpacing: 1,
@@ -293,8 +292,8 @@ class _WordleScreenState extends State<WordleScreen> {
                                 () => currentGuess = value.toUpperCase(),
                               );
                             },
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: textPrimary,
                               fontWeight: FontWeight.w600,
                               fontSize: 18,
                               letterSpacing: 8,
@@ -303,12 +302,12 @@ class _WordleScreenState extends State<WordleScreen> {
                             decoration: InputDecoration(
                               hintText: '· · · · ·',
                               hintStyle: TextStyle(
-                                color: Colors.white24,
+                                color: textFaint,
                                 letterSpacing: 12,
                                 fontSize: 20,
                               ),
-                              counterStyle: const TextStyle(
-                                color: Colors.white30,
+                              counterStyle: TextStyle(
+                                color: textMuted.withOpacity(0.5),
                               ),
                               filled: true,
                               fillColor: tileBase.withOpacity(0.5),
@@ -318,7 +317,7 @@ class _WordleScreenState extends State<WordleScreen> {
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
-                                borderSide: const BorderSide(
+                                borderSide: BorderSide(
                                   color: accentOrange,
                                   width: 2,
                                 ),
@@ -336,9 +335,10 @@ class _WordleScreenState extends State<WordleScreen> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: accentOrange,
                                 foregroundColor: Colors.white,
-                                disabledBackgroundColor: Colors.white
-                                    .withOpacity(0.08),
-                                disabledForegroundColor: Colors.white38,
+                                disabledBackgroundColor: isBday
+                                    ? Colors.white.withOpacity(0.08)
+                                    : Colors.purple.withOpacity(0.08),
+                                disabledForegroundColor: textMuted,
                                 shape: const StadiumBorder(),
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 14,

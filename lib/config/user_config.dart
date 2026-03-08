@@ -8,7 +8,7 @@ class UserConfig {
   // ── Birthday Honoree ──
   static const String birthdayPersonName = 'Siddhant';
   static const String birthdayPersonEmail = 'asmatkaurtaunque@gmail.com'; // UPDATE
-  static const String birthdayDate = '2001-03-08';
+  static const String birthdayDate = '2001-03-09';
 
   // ── Admin emails (can preview birthday mode anytime) ──
   static const List<String> adminEmails = [

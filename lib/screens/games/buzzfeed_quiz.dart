@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../config/game_data.dart';
 
 /// "10 things I (don't) hate about you" section: 10 cards, tap to flip to next praise.
 class TenThingsScreen extends StatefulWidget {
@@ -11,20 +12,15 @@ class TenThingsScreen extends StatefulWidget {
 }
 
 class _TenThingsScreenState extends State<TenThingsScreen> {
-  final List<String> praises = [
-    'You always make everyone laugh!',
-    'Your curiosity is inspiring.',
-    'You’re a loyal friend.',
-    'You have great taste in music.',
-    'You’re always up for an adventure.',
-    'You give the best advice.',
-    'You’re incredibly thoughtful.',
-    'You light up every room.',
-    'You’re a problem solver.',
-    'You make life more fun!',
-  ];
+  late List<String> praises;
 
   int currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    praises = GameData.getPraises(widget.isBirthdayMode);
+  }
 
   void _nextCard() {
     setState(() {
@@ -34,10 +30,14 @@ class _TenThingsScreenState extends State<TenThingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const bgTop = Color(0xFF1A0A2E);
-    const bgBottom = Color(0xFF2D1B4E);
-    const accentOrange = Color(0xFFFF8C42);
-    const tileBase = Color(0xFF3B1F6E);
+    final isBday = widget.isBirthdayMode;
+    final bgTop = isBday ? const Color(0xFF1A0A2E) : const Color(0xFFFAF5FF);
+    final bgBottom = isBday ? const Color(0xFF2D1B4E) : const Color(0xFFF3E8FF);
+    final accentOrange = isBday ? const Color(0xFFFF8C42) : const Color(0xFFFFA500);
+    final tileBase = isBday ? const Color(0xFF3B1F6E) : const Color(0xFFE9D5FF);
+    final textPrimary = isBday ? Colors.white : const Color(0xFF2D1B4E);
+    final textMuted = isBday ? Colors.white38 : Colors.purple.shade300;
+    final textFaint = isBday ? Colors.white.withOpacity(0.3) : Colors.purple.shade200;
 
     return Scaffold(
       appBar: AppBar(
@@ -45,10 +45,12 @@ class _TenThingsScreenState extends State<TenThingsScreen> {
         automaticallyImplyLeading: true,
         elevation: 0,
         backgroundColor: bgTop,
-        iconTheme: const IconThemeData(color: Colors.white70),
+        iconTheme: IconThemeData(
+          color: isBday ? Colors.white70 : Colors.purple.shade400,
+        ),
       ),
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -75,7 +77,7 @@ class _TenThingsScreenState extends State<TenThingsScreen> {
                               ? accentOrange
                               : i < currentIndex
                               ? accentOrange.withOpacity(0.4)
-                              : Colors.white24,
+                              : (isBday ? Colors.white24 : Colors.purple.shade100),
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
@@ -86,8 +88,8 @@ class _TenThingsScreenState extends State<TenThingsScreen> {
               const SizedBox(height: 8),
               Text(
                 '${currentIndex + 1} / ${praises.length}',
-                style: const TextStyle(
-                  color: Colors.white38,
+                style: TextStyle(
+                  color: textMuted,
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                 ),
@@ -124,10 +126,10 @@ class _TenThingsScreenState extends State<TenThingsScreen> {
                         child: Center(
                           child: Text(
                             praises[currentIndex],
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.w700,
-                              color: Colors.white,
+                              color: textPrimary,
                               height: 1.4,
                             ),
                             textAlign: TextAlign.center,
@@ -144,7 +146,7 @@ class _TenThingsScreenState extends State<TenThingsScreen> {
                 child: Text(
                   'Tap the card to reveal the next one',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.3),
+                    color: textFaint,
                     fontSize: 13,
                   ),
                 ),
