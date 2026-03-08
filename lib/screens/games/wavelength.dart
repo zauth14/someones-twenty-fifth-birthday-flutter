@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class WavelengthScreen extends StatefulWidget {
-  const WavelengthScreen({super.key});
+  final bool isBirthdayMode;
+  
+  const WavelengthScreen({super.key, this.isBirthdayMode = false});
 
   @override
   State<WavelengthScreen> createState() => _WavelengthScreenState();

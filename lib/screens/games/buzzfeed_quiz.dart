@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 
-class BuzzfeedQuizScreen extends StatefulWidget {
-  const BuzzfeedQuizScreen({super.key});
+class BuzzFeedQuizScreen extends StatefulWidget {
+  final bool isBirthdayMode;
+  
+  const BuzzFeedQuizScreen({super.key, this.isBirthdayMode = false});
 
   @override
-  State<BuzzfeedQuizScreen> createState() => _BuzzfeedQuizScreenState();
+  State<BuzzFeedQuizScreen> createState() => _BuzzFeedQuizScreenState();
 }
 
-class _BuzzfeedQuizScreenState extends State<BuzzfeedQuizScreen> {
+class _BuzzFeedQuizScreenState extends State<BuzzFeedQuizScreen> {
   final List<Map<String, dynamic>> questions = [
     {
       'question': 'What\'s your ideal birthday celebration?',

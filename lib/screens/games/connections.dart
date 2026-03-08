@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class ConnectionsScreen extends StatefulWidget {
-  const ConnectionsScreen({super.key});
+  final bool isBirthdayMode;
+  
+  const ConnectionsScreen({super.key, this.isBirthdayMode = false});
 
   @override
   State<ConnectionsScreen> createState() => _ConnectionsScreenState();

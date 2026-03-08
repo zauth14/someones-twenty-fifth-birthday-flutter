@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../config/app_theme.dart';
 import 'games/wordle.dart';
 import 'games/connections.dart';
 import 'games/wavelength.dart';
@@ -7,81 +9,123 @@ import 'games/buzzfeed_quiz.dart';
 class GameHubScreen extends StatelessWidget {
   const GameHubScreen({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    final games = [
-      {
-        'name': 'Buzzfeed Quiz',
-        'emoji': '🧠',
-        'description': 'Generate fun personality quizzes',
-        'screen': const BuzzfeedQuizScreen(),
-      },
-      {
-        'name': 'Wordle',
-        'emoji': '🟩',
-        'description': 'Guess the 5-letter word in 6 tries',
-        'screen': const WordleScreen(),
-      },
-      {
-        'name': 'Connections',
-        'emoji': '🔗',
-        'description': 'Find four groups of related items',
-        'screen': const ConnectionsScreen(),
-      },
-      {
-        'name': 'Wavelength',
-        'emoji': '🌊',
-        'description': 'Place a concept on a spectrum',
-        'screen': const WavelengthScreen(),
-      },
-    ];
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Someone's 25th Birthday Games"),
-        centerTitle: true,
-        elevation: 0,
-      ),
-      body: GridView.builder(
-        padding: const EdgeInsets.all(16),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 0.85,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-        ),
-        itemCount: games.length,
-        itemBuilder: (context, index) {
-          final game = games[index];
-          return GameCard(
-            emoji: game['emoji'] as String,
-            name: game['name'] as String,
-            description: game['description'] as String,
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => game['screen'] as Widget,
-                ),
-              );
-            },
+  void _navigateTo(BuildContext context, Widget screen) {
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 520),
+        pageBuilder: (context, animation, secondaryAnimation) => screen,
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          final curved = CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOutCubic,
+          );
+          return FadeTransition(
+            opacity: curved,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0.06, 0),
+                end: Offset.zero,
+              ).animate(curved),
+              child: child,
+            ),
           );
         },
       ),
     );
   }
+
+  @override
+  Widget build(BuildContext context) {
+    final games = [
+      {
+        'name': 'Personality Quiz',
+        'emoji': '💭',
+        'description': 'Fun quizzes about you',
+        'screen': const BuzzFeedQuizScreen(isBirthdayMode: false),
+        'color': AppTheme.normalBluePrimary,
+      },
+      {
+        'name': '5-Letter Challenge',
+        'emoji': '🔤',
+        'description': 'Guess the word in 6 tries',
+        'screen': const WordleScreen(isBirthdayMode: false),
+        'color': AppTheme.normalGreenPrimary,
+      },
+      {
+        'name': 'Spectrum Game',
+        'emoji': '〰️',
+        'description': 'Place concepts on a scale',
+        'screen': const WavelengthScreen(isBirthdayMode: false),
+        'color': AppTheme.normalAccent,
+      },
+      {
+        'name': 'Category Match',
+        'emoji': '🔗',
+        'description': 'Find groups of four',
+        'screen': const ConnectionsScreen(isBirthdayMode: false),
+        'color': const Color(0xFFEC4899),
+      },
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Text(
+            'Choose Your Game 🎮',
+            style: GoogleFonts.inter(
+              fontSize: 26,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.normalTextPrimary,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Pick a game and have fun!',
+            style: GoogleFonts.inter(fontSize: 14, color: Colors.grey.shade600),
+          ),
+          const SizedBox(height: 20),
+
+          // Games List
+          Expanded(
+            child: ListView.builder(
+              padding: EdgeInsets.zero,
+              itemCount: games.length,
+              itemBuilder: (context, index) {
+                final game = games[index];
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 14),
+                  child: _GameCard(
+                    emoji: game['emoji'] as String,
+                    name: game['name'] as String,
+                    description: game['description'] as String,
+                    color: game['color'] as Color,
+                    onTap: () => _navigateTo(context, game['screen'] as Widget),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
-class GameCard extends StatelessWidget {
+class _GameCard extends StatelessWidget {
   final String emoji;
   final String name;
   final String description;
+  final Color color;
   final VoidCallback onTap;
 
-  const GameCard({
-    super.key,
+  const _GameCard({
     required this.emoji,
     required this.name,
     required this.description,
+    required this.color,
     required this.onTap,
   });
 
@@ -89,41 +133,72 @@ class GameCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Colors.pink.shade100, Colors.purple.shade100],
+      child: Container(
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.12),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
             ),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(emoji, style: const TextStyle(fontSize: 50)),
-              const SizedBox(height: 12),
-              Text(
-                name,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
+          ],
+        ),
+        child: Row(
+          children: [
+            // Emoji Circle
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                shape: BoxShape.circle,
               ),
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Text(
-                  description,
-                  style: Theme.of(context).textTheme.bodySmall,
-                  textAlign: TextAlign.center,
-                ),
+              child: Center(
+                child: Text(emoji, style: const TextStyle(fontSize: 28)),
               ),
-            ],
-          ),
+            ),
+            const SizedBox(width: 14),
+
+            // Text
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    style: GoogleFonts.inter(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.normalTextPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    description,
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Arrow
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+              child: const Icon(
+                Icons.arrow_forward,
+                color: Colors.white,
+                size: 17,
+              ),
+            ),
+          ],
         ),
       ),
     );

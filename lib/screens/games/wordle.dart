@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 import 'dart:math';
 
 class WordleScreen extends StatefulWidget {
-  const WordleScreen({super.key});
+  final bool isBirthdayMode;
+  
+  const WordleScreen({super.key, this.isBirthdayMode = false});
 
   @override
   State<WordleScreen> createState() => _WordleScreenState();
