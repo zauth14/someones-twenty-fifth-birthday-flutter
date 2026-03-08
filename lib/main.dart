@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'config/app_theme.dart';
 import 'config/user_config.dart';
 import 'services/auth_service.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const BirthdayApp());
 }
 
@@ -18,39 +22,33 @@ class BirthdayApp extends StatelessWidget {
       title: UserConfig.appName,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.getNormalTheme(),
-      darkTheme: AppTheme.getBirthdayTheme(),
-      home: const AuthWrapper(),
+      home: const AuthGate(),
     );
   }
 }
 
-/// Wrapper to check authentication status on app start
-class AuthWrapper extends StatelessWidget {
-  const AuthWrapper({super.key});
+/// Listens to Firebase auth state and routes accordingly.
+class AuthGate extends StatelessWidget {
+  const AuthGate({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<bool>(
-      future: AuthService.isLoggedIn(),
+    return StreamBuilder(
+      stream: AuthService.authStateChanges,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          // Show splash screen while checking auth
           return const SplashScreen();
         }
-
-        final isLoggedIn = snapshot.data ?? false;
-
-        if (isLoggedIn) {
+        if (snapshot.hasData) {
           return const HomeScreen();
-        } else {
-          return const LoginScreen();
         }
+        return const LoginScreen();
       },
     );
   }
 }
 
-/// Simple splash screen
+/// Splash shown while Firebase checks auth state.
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
@@ -58,22 +56,14 @@ class SplashScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: AppTheme.birthdayGradient,
-        ),
+        decoration: const BoxDecoration(gradient: AppTheme.birthdayGradient),
         child: const Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.celebration,
-                size: 80,
-                color: Colors.white,
-              ),
+              Icon(Icons.celebration, size: 80, color: Colors.white),
               SizedBox(height: 24),
-              CircularProgressIndicator(
-                color: Colors.white,
-              ),
+              CircularProgressIndicator(color: Colors.white),
             ],
           ),
         ),

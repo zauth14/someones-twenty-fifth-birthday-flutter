@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "333150760216",
+    "project_id": "birthday-app-8e4a5",
+    "storage_bucket": "birthday-app-8e4a5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:333150760216:android:fec6748dfcef9611a9c26d",
+        "android_client_info": {
+          "package_name": "com.example.someones_twenty_fifth_birthday_flutter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCt17oLNZX9UVjTpxuG0ISwiRPq_4jOe4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

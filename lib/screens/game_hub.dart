@@ -41,7 +41,7 @@ class GameHubScreen extends StatelessWidget {
         'name': 'Personality Quiz',
         'emoji': '💭',
         'description': 'Fun quizzes about you',
-        'screen': const BuzzFeedQuizScreen(isBirthdayMode: false),
+        'screen': TenThingsScreen(isBirthdayMode: false),
         'color': AppTheme.normalBluePrimary,
       },
       {

@@ -251,7 +251,7 @@ class _BirthdayModeScreenState extends State<BirthdayModeScreen>
                         ),
                       ),
                       child: Text(
-                        '✨ All personalized just for ${UserConfig.userName}! ✨',
+                        '✨ All personalized just for ${UserConfig.birthdayPersonName}! ✨',
                         style: GoogleFonts.poppins(
                           color: Colors.white,
                           fontSize: 13,
@@ -291,8 +291,7 @@ class _BirthdayModeScreenState extends State<BirthdayModeScreen>
   // ─── TRIVIA Section ───
   Widget _buildTriviaCard() {
     return GestureDetector(
-      onTap: () =>
-          _navigateToGame(const BuzzFeedQuizScreen(isBirthdayMode: true)),
+      onTap: () => _navigateToGame(TenThingsScreen(isBirthdayMode: true)),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(20),
@@ -333,7 +332,7 @@ class _BirthdayModeScreenState extends State<BirthdayModeScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'How well do you know ${UserConfig.userName}?',
+                        'How well do you know ${UserConfig.birthdayPersonName}?',
                         style: GoogleFonts.poppins(
                           fontSize: 17,
                           fontWeight: FontWeight.bold,
@@ -494,7 +493,7 @@ class _BirthdayModeScreenState extends State<BirthdayModeScreen>
       {
         'icon': '〰️',
         'title': 'Spectrum',
-        'sub': "Guess ${UserConfig.userName}'s vibe",
+        'sub': "Guess ${UserConfig.birthdayPersonName}'s vibe",
         'colors': [AppTheme.birthdayPurpleDark, AppTheme.birthdayOrangeDark],
         'screen': const WavelengthScreen(isBirthdayMode: true),
       },

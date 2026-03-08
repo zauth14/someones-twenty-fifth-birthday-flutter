@@ -1,120 +1,97 @@
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../config/user_config.dart';
 
-/// Authentication service for local login
-/// Phase 1: Simple local authentication with account creation
-/// Phase 2: Firebase authentication
+/// Firebase-backed authentication service.
+///
+/// Handles sign-up, login, logout, and role queries (admin / birthday person).
 class AuthService {
-  static const String _keyIsLoggedIn = 'is_logged_in';
-  static const String _keyUsername = 'username';
-  static const String _keyStoredUsername = 'stored_username';
-  static const String _keyStoredPassword = 'stored_password';
-  static const String _keyDisplayName = 'display_name';
-  static const String _keyAccountExists = 'account_exists';
-  
-  /// Check if user is logged in
-  static Future<bool> isLoggedIn() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(_keyIsLoggedIn) ?? false;
-  }
-  
-  /// Check if an account has been created
-  static Future<bool> accountExists() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(_keyAccountExists) ?? false;
-  }
-  
-  /// Get logged in username
-  static Future<String?> getUsername() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_keyUsername);
-  }
-  
-  /// Create a new account (stores credentials locally)
-  static Future<LoginResult> register(String username, String password, String displayName) async {
-    // Simulate network delay
-    await Future.delayed(const Duration(milliseconds: 500));
-    
-    if (username.trim().isEmpty) {
-      return LoginResult(success: false, message: 'Username cannot be empty');
+  static final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  // ── Current user shortcuts ──
+  static User? get currentUser => _auth.currentUser;
+  static Stream<User?> get authStateChanges => _auth.authStateChanges();
+  static bool get isLoggedIn => currentUser != null;
+  static String? get email => currentUser?.email;
+  static String? get displayName => currentUser?.displayName;
+
+  // ── Role checks (based on email in UserConfig) ──
+  static bool get isAdmin => UserConfig.isAdmin(email);
+  static bool get isBirthdayPerson => UserConfig.isBirthdayPerson(email);
+
+  /// Whether this user should see birthday mode right now.
+  static bool get shouldShowBirthdayMode =>
+      (isBirthdayPerson && UserConfig.isBirthdayToday()) || isAdmin;
+
+  /// Whether birthday mode should auto-enable (no toggle — it's on).
+  static bool get autoBirthdayMode =>
+      isBirthdayPerson && UserConfig.isBirthdayToday();
+
+  // ── Auth operations ──
+
+  static Future<AuthResult> register(
+    String email,
+    String password,
+    String displayName,
+  ) async {
+    try {
+      final cred = await _auth.createUserWithEmailAndPassword(
+        email: email.trim(),
+        password: password,
+      );
+      await cred.user?.updateDisplayName(displayName.trim());
+      await cred.user?.reload(); // ensure displayName sticks
+      return AuthResult(success: true, message: 'Welcome, $displayName!');
+    } on FirebaseAuthException catch (e) {
+      return AuthResult(success: false, message: _friendlyError(e.code));
+    } catch (e) {
+      return AuthResult(success: false, message: 'Something went wrong.');
     }
-    if (password.length < 4) {
-      return LoginResult(success: false, message: 'Password must be at least 4 characters');
-    }
-    if (displayName.trim().isEmpty) {
-      return LoginResult(success: false, message: 'Display name cannot be empty');
-    }
-    
-    final prefs = await SharedPreferences.getInstance();
-    
-    // Check if account already exists
-    if (prefs.getBool(_keyAccountExists) == true) {
-      return LoginResult(success: false, message: 'An account already exists. Please log in.');
-    }
-    
-    // Save credentials
-    await prefs.setString(_keyStoredUsername, username.toLowerCase().trim());
-    await prefs.setString(_keyStoredPassword, password);
-    await prefs.setString(_keyDisplayName, displayName.trim());
-    await prefs.setBool(_keyAccountExists, true);
-    
-    // Auto-login after registration
-    await prefs.setBool(_keyIsLoggedIn, true);
-    await prefs.setString(_keyUsername, displayName.trim());
-    
-    return LoginResult(success: true, message: 'Account created! Welcome, ${displayName.trim()}!');
   }
-  
-  /// Login with username and password
-  static Future<LoginResult> login(String username, String password) async {
-    // Simulate network delay
-    await Future.delayed(const Duration(milliseconds: 500));
-    
-    final prefs = await SharedPreferences.getInstance();
-    
-    // Check against saved account first
-    final storedUsername = prefs.getString(_keyStoredUsername);
-    final storedPassword = prefs.getString(_keyStoredPassword);
-    final displayName = prefs.getString(_keyDisplayName);
-    
-    if (storedUsername != null && storedPassword != null) {
-      if (username.toLowerCase().trim() == storedUsername && 
-          password == storedPassword) {
-        await prefs.setBool(_keyIsLoggedIn, true);
-        await prefs.setString(_keyUsername, displayName ?? username);
-        return LoginResult(success: true, message: 'Welcome back, ${displayName ?? username}!');
-      }
+
+  static Future<AuthResult> login(String email, String password) async {
+    try {
+      await _auth.signInWithEmailAndPassword(
+        email: email.trim(),
+        password: password,
+      );
+      final name = _auth.currentUser?.displayName ?? 'there';
+      return AuthResult(success: true, message: 'Welcome back, $name!');
+    } on FirebaseAuthException catch (e) {
+      return AuthResult(success: false, message: _friendlyError(e.code));
+    } catch (e) {
+      return AuthResult(success: false, message: 'Something went wrong.');
     }
-    
-    // Also check against hard-coded values as fallback
-    if (username.toLowerCase() == UserConfig.loginUsername && 
-        password == UserConfig.loginPassword) {
-      await prefs.setBool(_keyIsLoggedIn, true);
-      await prefs.setString(_keyUsername, UserConfig.userName);
-      return LoginResult(success: true, message: 'Welcome back, ${UserConfig.userName}!');
+  }
+
+  static Future<void> logout() => _auth.signOut();
+
+  // ── Error mapping ──
+
+  static String _friendlyError(String code) {
+    switch (code) {
+      case 'email-already-in-use':
+        return 'That email is already registered.';
+      case 'invalid-email':
+        return 'Please enter a valid email address.';
+      case 'weak-password':
+        return 'Password must be at least 6 characters.';
+      case 'user-not-found':
+        return 'No account found with that email.';
+      case 'wrong-password':
+        return 'Incorrect password.';
+      case 'invalid-credential':
+        return 'Invalid email or password.';
+      case 'too-many-requests':
+        return 'Too many attempts. Try again later.';
+      default:
+        return 'Something went wrong. ($code)';
     }
-    
-    return LoginResult(success: false, message: 'Invalid username or password');
-  }
-  
-  /// Logout
-  static Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_keyIsLoggedIn);
-    await prefs.remove(_keyUsername);
-  }
-  
-  /// Clear all data (for testing)
-  static Future<void> clearAll() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
   }
 }
 
-/// Login result model
-class LoginResult {
+/// Simple result wrapper.
+class AuthResult {
   final bool success;
   final String message;
-  
-  LoginResult({required this.success, required this.message});
+  AuthResult({required this.success, required this.message});
 }

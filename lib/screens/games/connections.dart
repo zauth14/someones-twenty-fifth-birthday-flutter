@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class ConnectionsScreen extends StatefulWidget {
   final bool isBirthdayMode;
-  
+
   const ConnectionsScreen({super.key, this.isBirthdayMode = false});
 
   @override
@@ -81,7 +81,12 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('🔗 Connections')),
+      appBar: AppBar(
+        title: null,
+        automaticallyImplyLeading: true,
+        elevation: 0,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

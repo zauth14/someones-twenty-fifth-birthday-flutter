@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../config/app_theme.dart';
@@ -16,61 +17,112 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool _showBirthdayMode = false;
+  Timer? _timer;
+  Duration _remaining = Duration.zero;
+
+  bool get _isAdmin => AuthService.isAdmin;
+  bool get _isBirthdayPerson => AuthService.isBirthdayPerson;
+  bool get _isBirthdayToday => UserConfig.isBirthdayToday();
+
+  /// Can this user see the birthday mode toggle?
+  bool get _canToggle => _isAdmin && !(_isBirthdayPerson && _isBirthdayToday);
 
   @override
   void initState() {
     super.initState();
-    _showBirthdayMode = UserConfig.isBirthdayToday();
+
+    // Auto-enable for birthday person on their birthday
+    if (_isBirthdayPerson && _isBirthdayToday) {
+      _showBirthdayMode = true;
+    }
+
+    _startTimer();
   }
 
-  void _toggleMode() {
-    setState(() {
-      _showBirthdayMode = !_showBirthdayMode;
+  void _startTimer() {
+    _updateRemaining();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      _updateRemaining();
     });
   }
 
+  void _updateRemaining() {
+    if (!mounted) return;
+    setState(() {
+      if (_isBirthdayToday) {
+        _remaining = UserConfig.birthdayTimeRemaining() ?? Duration.zero;
+      } else {
+        _remaining = UserConfig.timeUntilBirthday();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _toggleMode() {
+    if (!_canToggle) return;
+    setState(() => _showBirthdayMode = !_showBirthdayMode);
+  }
+
   Future<void> _handleLogout() async {
-    final shouldLogout = await showDialog<bool>(
+    final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (ctx) => AlertDialog(
         title: const Text('Logout'),
-        content: const Text('Are you sure you want to logout?'),
+        content: const Text('Are you sure?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () => Navigator.pop(ctx, false),
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => Navigator.pop(ctx, true),
             child: const Text('Logout'),
           ),
         ],
       ),
     );
-
-    if (shouldLogout == true && mounted) {
+    if (confirm == true && mounted) {
       await AuthService.logout();
       if (mounted) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const LoginScreen()),
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
         );
       }
     }
   }
 
+  // ── Formatting helpers ──
+
+  String _fmtCountdown(Duration d) {
+    if (d.inDays > 0) {
+      return '${d.inDays}d ${d.inHours.remainder(24)}h';
+    }
+    final h = d.inHours.remainder(24).toString().padLeft(2, '0');
+    final m = d.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final s = d.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return '$h:$m:$s';
+  }
+
+  // ── Build ──
+
   @override
   Widget build(BuildContext context) {
+    final isBDay = _showBirthdayMode;
+
     return Scaffold(
-      backgroundColor: _showBirthdayMode
+      backgroundColor: isBDay
           ? AppTheme.birthdayBackground
           : AppTheme.normalBackground,
       body: Column(
         children: [
-          // Top bar
+          // ── Top bar ──
           Container(
-            color: _showBirthdayMode
-                ? Colors.transparent
-                : AppTheme.normalBackground,
+            color: isBDay ? Colors.transparent : AppTheme.normalBackground,
             child: SafeArea(
               bottom: false,
               child: Padding(
@@ -79,17 +131,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   vertical: 8,
                 ),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Logout Button
-                    _buildPillButton(
+                    // Logout
+                    _Pill(
+                      dark: isBDay,
                       child: IconButton(
                         icon: Icon(
                           Icons.logout,
                           size: 20,
-                          color: _showBirthdayMode
-                              ? Colors.white70
-                              : Colors.black54,
+                          color: isBDay ? Colors.white70 : Colors.black54,
                         ),
                         onPressed: _handleLogout,
                         tooltip: 'Logout',
@@ -101,10 +151,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
 
-                    // Mode Toggle
-                    _buildPillButton(
-                      child: GestureDetector(
-                        onTap: _toggleMode,
+                    const Spacer(),
+
+                    // Countdown / expiry timer (always visible for admins + birthday person)
+                    if (_isAdmin || _isBirthdayPerson) ...[
+                      _Pill(
+                        dark: isBDay,
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 12,
@@ -113,90 +165,153 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
+                              Icon(
+                                _isBirthdayToday ? Icons.timer : Icons.cake,
+                                size: 16,
+                                color: isBDay
+                                    ? AppTheme.birthdayTextAccent
+                                    : AppTheme.normalBluePrimary,
+                              ),
+                              const SizedBox(width: 6),
                               Text(
-                                _showBirthdayMode ? '🎂 Birthday' : '🎮 Normal',
+                                _isBirthdayToday
+                                    ? _fmtCountdown(_remaining)
+                                    : '${_remaining.inDays}d',
                                 style: GoogleFonts.poppins(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
-                                  color: _showBirthdayMode
-                                      ? Colors.white
-                                      : Colors.black87,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Container(
-                                width: 40,
-                                height: 22,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(11),
-                                  gradient: _showBirthdayMode
-                                      ? const LinearGradient(
-                                          colors: [
-                                            AppTheme.birthdayPurplePrimary,
-                                            AppTheme.birthdayOrangePrimary,
-                                          ],
-                                        )
-                                      : const LinearGradient(
-                                          colors: [
-                                            AppTheme.normalBluePrimary,
-                                            AppTheme.normalGreenPrimary,
-                                          ],
-                                        ),
-                                ),
-                                child: AnimatedAlign(
-                                  duration: const Duration(milliseconds: 200),
-                                  curve: Curves.easeInOut,
-                                  alignment: _showBirthdayMode
-                                      ? Alignment.centerRight
-                                      : Alignment.centerLeft,
-                                  child: Container(
-                                    width: 18,
-                                    height: 18,
-                                    margin: const EdgeInsets.symmetric(
-                                      horizontal: 2,
-                                    ),
-                                    decoration: const BoxDecoration(
-                                      color: Colors.white,
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
+                                  color: isBDay ? Colors.white : Colors.black87,
                                 ),
                               ),
                             ],
                           ),
                         ),
                       ),
-                    ),
+                      const SizedBox(width: 8),
+                    ],
+
+                    // Mode toggle (admins only, not birthday person on their day)
+                    if (_canToggle)
+                      _Pill(
+                        dark: isBDay,
+                        child: GestureDetector(
+                          onTap: _toggleMode,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  isBDay ? '🎂' : '🎮',
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                                const SizedBox(width: 8),
+                                Container(
+                                  width: 40,
+                                  height: 22,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(11),
+                                    gradient: isBDay
+                                        ? const LinearGradient(
+                                            colors: [
+                                              AppTheme.birthdayPurplePrimary,
+                                              AppTheme.birthdayOrangePrimary,
+                                            ],
+                                          )
+                                        : const LinearGradient(
+                                            colors: [
+                                              AppTheme.normalBluePrimary,
+                                              AppTheme.normalGreenPrimary,
+                                            ],
+                                          ),
+                                  ),
+                                  child: AnimatedAlign(
+                                    duration: const Duration(milliseconds: 200),
+                                    curve: Curves.easeInOut,
+                                    alignment: isBDay
+                                        ? Alignment.centerRight
+                                        : Alignment.centerLeft,
+                                    child: Container(
+                                      width: 18,
+                                      height: 18,
+                                      margin: const EdgeInsets.symmetric(
+                                        horizontal: 2,
+                                      ),
+                                      decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),
             ),
           ),
 
-          // Main Content
+          // ── Countdown banner (non-admin, non-birthday, within 7 days) ──
+          if (!_isAdmin &&
+              !_isBirthdayPerson &&
+              !_isBirthdayToday &&
+              _remaining.inDays <= 7 &&
+              _remaining.inDays > 0)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    AppTheme.birthdayPurplePrimary.withOpacity(0.9),
+                    AppTheme.birthdayOrangePrimary.withOpacity(0.9),
+                  ],
+                ),
+              ),
+              child: Text(
+                '🎂 ${UserConfig.birthdayPersonName}\'s birthday in ${_remaining.inDays} days!',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+
+          // ── Content ──
           Expanded(
-            child: _showBirthdayMode
-                ? const BirthdayModeScreen()
-                : const GameHubScreen(),
+            child: isBDay ? const BirthdayModeScreen() : const GameHubScreen(),
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildPillButton({required Widget child}) {
+/// Reusable pill-shaped container for top bar items.
+class _Pill extends StatelessWidget {
+  final bool dark;
+  final Widget child;
+  const _Pill({required this.dark, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: _showBirthdayMode
-            ? Colors.white.withOpacity(0.15)
-            : Colors.white,
+        color: dark ? Colors.white.withOpacity(0.15) : Colors.white,
         borderRadius: BorderRadius.circular(999),
         border: Border.all(
-          color: _showBirthdayMode
-              ? Colors.white.withOpacity(0.25)
-              : Colors.grey.shade200,
+          color: dark ? Colors.white.withOpacity(0.25) : Colors.grey.shade200,
         ),
-        boxShadow: _showBirthdayMode
+        boxShadow: dark
             ? []
             : [
                 BoxShadow(
