@@ -7,6 +7,7 @@ import 'games/buzzfeed_quiz.dart';
 import 'games/wordle.dart';
 import 'games/wavelength.dart';
 import 'games/connections.dart';
+import 'games/quiz_time.dart';
 
 class BirthdayModeScreen extends StatefulWidget {
   const BirthdayModeScreen({super.key});
@@ -503,6 +504,16 @@ class _BirthdayModeScreenState extends State<BirthdayModeScreen>
         'sub': 'Find the matching groups',
         'colors': [AppTheme.birthdayPurplePrimary, AppTheme.birthdayPurpleDark],
         'screen': const ConnectionsScreen(isBirthdayMode: true),
+      },
+      {
+        'icon': '🧠',
+        'title': 'Quiz Time',
+        'sub': 'Fun personality quizzes',
+        'colors': [
+          AppTheme.birthdayOrangePrimary,
+          AppTheme.birthdayPurplePrimary,
+        ],
+        'screen': const QuizTimeScreen(isBirthdayMode: true),
       },
     ];
 

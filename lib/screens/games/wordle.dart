@@ -73,167 +73,217 @@ class _WordleScreenState extends State<WordleScreen> {
     final secretLetter = secretWord[index];
 
     if (letter == secretLetter) {
-      return Colors.green;
+      return const Color(0xFF22C55E); // green = correct
     } else if (secretWord.contains(letter)) {
-      return Colors.yellow;
+      return const Color(0xFFFF8C42); // orange = in word
     } else {
-      return Colors.grey;
+      return const Color(0xFF2D1B4E); // dark plum = not in word
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    const bgTop = Color(0xFF1A0A2E);
+    const bgBottom = Color(0xFF2D1B4E);
+    const accentOrange = Color(0xFFFF8C42);
+    const accentRose = Color(0xFFFB7185);
+    const tileBase = Color(0xFF3B1F6E);
+
     return Scaffold(
       appBar: AppBar(
         title: null,
         automaticallyImplyLeading: true,
         elevation: 0,
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        backgroundColor: bgTop,
+        iconTheme: const IconThemeData(color: Colors.white70),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (gameWon)
-                  Column(
-                    children: [
-                      const Text(
-                        '🎉 You Won!',
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(_initializeGame);
-                        },
-                        child: const Text('Play Again'),
-                      ),
-                    ],
-                  )
-                else if (gameLost)
-                  Column(
-                    children: [
-                      Text(
-                        'Game Over! The word was: $secretWord',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.red,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(_initializeGame);
-                        },
-                        child: const Text('Try Again'),
-                      ),
-                    ],
-                  )
-                else
-                  Card(
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    color: Colors.purple.shade50,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 24,
-                        horizontal: 12,
-                      ),
-                      child: Column(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [bgTop, bgBottom],
+          ),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (gameWon)
+                      Column(
                         children: [
-                          Text(
-                            'Attempts left: $attemptsLeft',
+                          const Text(
+                            '✨ Cracked it!',
                             style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.purple.shade700,
+                              fontSize: 30,
+                              fontWeight: FontWeight.w900,
+                              color: accentOrange,
                             ),
                           ),
                           const SizedBox(height: 20),
-                          // --- Custom grid ---
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.replay_rounded),
+                            label: const Text('New Word'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: accentOrange,
+                              foregroundColor: Colors.white,
+                              shape: const StadiumBorder(),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 32,
+                                vertical: 14,
+                              ),
+                            ),
+                            onPressed: () => setState(_initializeGame),
+                          ),
+                        ],
+                      )
+                    else if (gameLost)
+                      Column(
+                        children: [
+                          Text(
+                            '💔 The word was: $secretWord',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w800,
+                              color: accentRose,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.replay_rounded),
+                            label: const Text('Try Again'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: accentRose,
+                              foregroundColor: Colors.white,
+                              shape: const StadiumBorder(),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 32,
+                                vertical: 14,
+                              ),
+                            ),
+                            onPressed: () => setState(_initializeGame),
+                          ),
+                        ],
+                      )
+                    else
+                      Column(
+                        children: [
+                          // Attempts as dots
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                'Tries left  ',
+                                style: TextStyle(
+                                  color: Colors.white54,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              ...List.generate(6, (i) {
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 3,
+                                  ),
+                                  child: Icon(
+                                    i < attemptsLeft
+                                        ? Icons.circle
+                                        : Icons.circle_outlined,
+                                    color: i < attemptsLeft
+                                        ? accentOrange
+                                        : Colors.white24,
+                                    size: 12,
+                                  ),
+                                );
+                              }),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Letter grid
                           Column(
                             children: List.generate(6, (row) {
                               String guess = row < guesses.length
                                   ? guesses[row]
                                   : (row == guesses.length ? currentGuess : '');
-                              // Staggered effect: indent odd rows
-                              double leftPad = row.isOdd ? 24.0 : 0.0;
                               return Padding(
-                                padding: EdgeInsets.only(
-                                  left: leftPad,
-                                  bottom: 6,
-                                ),
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: List.generate(wordLength, (col) {
-                                      String letter = col < guess.length
-                                          ? guess[col]
-                                          : '';
-                                      Color color = Colors.transparent;
-                                      if (row < guesses.length) {
-                                        color = _getLetterColor(guess, col);
-                                      } else if (row == guesses.length &&
-                                          letter.isNotEmpty) {
-                                        color = Colors.purple.shade100;
-                                      }
-                                      return AnimatedContainer(
-                                        duration: const Duration(
-                                          milliseconds: 200,
+                                padding: const EdgeInsets.only(bottom: 8),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: List.generate(wordLength, (col) {
+                                    String letter = col < guess.length
+                                        ? guess[col]
+                                        : '';
+                                    Color color;
+                                    if (row < guesses.length) {
+                                      color = _getLetterColor(guess, col);
+                                    } else if (row == guesses.length &&
+                                        letter.isNotEmpty) {
+                                      color = tileBase.withOpacity(0.8);
+                                    } else {
+                                      color = tileBase.withOpacity(0.3);
+                                    }
+                                    return AnimatedContainer(
+                                      duration: const Duration(
+                                        milliseconds: 250,
+                                      ),
+                                      curve: Curves.easeOut,
+                                      width: 52,
+                                      height: 52,
+                                      margin: const EdgeInsets.symmetric(
+                                        horizontal: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: color,
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color:
+                                              row == guesses.length &&
+                                                  col == guess.length
+                                              ? accentOrange.withOpacity(0.6)
+                                              : Colors.white.withOpacity(0.08),
+                                          width:
+                                              row == guesses.length &&
+                                                  col == guess.length
+                                              ? 2
+                                              : 1,
                                         ),
-                                        width: 44,
-                                        height: 32,
-                                        margin: const EdgeInsets.symmetric(
-                                          horizontal: 4,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: color,
-                                          borderRadius: BorderRadius.circular(
-                                            20,
-                                          ), // pill shape
-                                          border: Border.all(
-                                            color: Colors.purple.shade200,
-                                            width: 2,
+                                        boxShadow: row < guesses.length
+                                            ? [
+                                                BoxShadow(
+                                                  color: color.withOpacity(0.4),
+                                                  blurRadius: 8,
+                                                  offset: const Offset(0, 2),
+                                                ),
+                                              ]
+                                            : [],
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          letter,
+                                          style: TextStyle(
+                                            color: row < guesses.length
+                                                ? Colors.white
+                                                : Colors.white.withOpacity(0.7),
+                                            fontWeight: FontWeight.w800,
+                                            fontSize: 22,
+                                            letterSpacing: 1,
                                           ),
-                                          boxShadow: [
-                                            if (row < guesses.length)
-                                              BoxShadow(
-                                                color: Colors.purple.shade100,
-                                                blurRadius: 4,
-                                                offset: Offset(0, 2),
-                                              ),
-                                          ],
                                         ),
-                                        child: Center(
-                                          child: Text(
-                                            letter,
-                                            style: TextStyle(
-                                              color: row < guesses.length
-                                                  ? Colors.white
-                                                  : Colors.purple.shade700,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 18,
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    }),
-                                  ),
+                                      ),
+                                    );
+                                  }),
                                 ),
                               );
                             }),
                           ),
                           const SizedBox(height: 20),
+
+                          // Input field
                           TextField(
                             controller: _guessController,
                             maxLength: wordLength,
@@ -243,38 +293,81 @@ class _WordleScreenState extends State<WordleScreen> {
                                 () => currentGuess = value.toUpperCase(),
                               );
                             },
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 18,
+                              letterSpacing: 8,
+                            ),
+                            textAlign: TextAlign.center,
                             decoration: InputDecoration(
-                              hintText: 'Type your guess',
+                              hintText: '· · · · ·',
+                              hintStyle: TextStyle(
+                                color: Colors.white24,
+                                letterSpacing: 12,
+                                fontSize: 20,
+                              ),
+                              counterStyle: const TextStyle(
+                                color: Colors.white30,
+                              ),
                               filled: true,
-                              fillColor: Colors.white,
+                              fillColor: tileBase.withOpacity(0.5),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide.none,
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: const BorderSide(
+                                  color: accentOrange,
+                                  width: 2,
+                                ),
                               ),
                             ),
                           ),
-                          const SizedBox(height: 16),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.purple.shade400,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
+                          const SizedBox(height: 12),
+
+                          // Submit button
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              icon: const Icon(Icons.send_rounded, size: 18),
+                              label: const Text('Lock In'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: accentOrange,
+                                foregroundColor: Colors.white,
+                                disabledBackgroundColor: Colors.white
+                                    .withOpacity(0.08),
+                                disabledForegroundColor: Colors.white38,
+                                shape: const StadiumBorder(),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
+                                textStyle: const TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 15,
+                                ),
                               ),
+                              onPressed: currentGuess.length == wordLength
+                                  ? _makeGuess
+                                  : null,
                             ),
-                            onPressed: currentGuess.length == wordLength
-                                ? _makeGuess
-                                : null,
-                            child: const Text('Submit Guess'),
                           ),
                         ],
                       ),
-                    ),
-                  ),
-              ],
+                  ],
+                ),
+              ),
             ),
           ),
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _guessController.dispose();
+    super.dispose();
   }
 }

@@ -5,6 +5,7 @@ import 'games/wordle.dart';
 import 'games/connections.dart';
 import 'games/wavelength.dart';
 import 'games/buzzfeed_quiz.dart';
+import 'games/quiz_time.dart';
 
 class GameHubScreen extends StatelessWidget {
   const GameHubScreen({super.key});
@@ -64,6 +65,13 @@ class GameHubScreen extends StatelessWidget {
         'description': 'Find groups of four',
         'screen': const ConnectionsScreen(isBirthdayMode: false),
         'color': const Color(0xFFEC4899),
+      },
+      {
+        'name': 'Quiz Time',
+        'emoji': '🧠',
+        'description': 'Fun personality quizzes',
+        'screen': const QuizTimeScreen(isBirthdayMode: false),
+        'color': const Color(0xFFFF8C42),
       },
     ];
 
