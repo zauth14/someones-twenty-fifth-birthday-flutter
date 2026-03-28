@@ -169,11 +169,24 @@ class _BirthdayModeScreenState extends State<BirthdayModeScreen>
 
         // Scrollable Content
         Positioned.fill(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 30),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final horizontalPadding =
+                  constraints.maxWidth >= 1000 ? 28.0 : 20.0;
+
+              return SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(
+                  horizontalPadding,
+                  8,
+                  horizontalPadding,
+                  30,
+                ),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 980),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
                 // Birthday Header
                 Text(
                   UserConfig.birthdayGreeting,
@@ -232,39 +245,44 @@ class _BirthdayModeScreenState extends State<BirthdayModeScreen>
 
                 const SizedBox(height: 20),
 
-                // Footer
-                AnimatedBuilder(
-                  animation: _glowController,
-                  builder: (context, child) {
-                    return Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 12,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(
-                          0.1 + 0.05 * _glowController.value,
+                        // Footer
+                        AnimatedBuilder(
+                          animation: _glowController,
+                          builder: (context, child) {
+                            return Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(
+                                  0.1 + 0.05 * _glowController.value,
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: AppTheme.birthdayTextAccent
+                                      .withOpacity(0.4),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Text(
+                                '✨ All personalized just for ${UserConfig.birthdayPersonName}! ✨',
+                                style: GoogleFonts.poppins(
+                                  color: Colors.white,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            );
+                          },
                         ),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: AppTheme.birthdayTextAccent.withOpacity(0.4),
-                          width: 1,
-                        ),
-                      ),
-                      child: Text(
-                        '✨ All personalized just for ${UserConfig.birthdayPersonName}! ✨',
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    );
-                  },
+                      ],
+                    ),
+                  ),
                 ),
-              ],
-            ),
+              );
+            },
           ),
         ),
       ],
@@ -333,7 +351,7 @@ class _BirthdayModeScreenState extends State<BirthdayModeScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'How well do you know ${UserConfig.birthdayPersonName}?',
+                        '10 Things I (Don\'t) Hate About You',
                         style: GoogleFonts.poppins(
                           fontSize: 17,
                           fontWeight: FontWeight.bold,
@@ -517,70 +535,80 @@ class _BirthdayModeScreenState extends State<BirthdayModeScreen>
       },
     ];
 
-    return Column(
-      children: games.map((g) {
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: GestureDetector(
-            onTap: () => _navigateToGame(g['screen'] as Widget),
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: g['colors'] as List<Color>,
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                ),
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: (g['colors'] as List<Color>)[0].withOpacity(0.3),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Text(
-                    g['icon'] as String,
-                    style: const TextStyle(fontSize: 32),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          g['title'] as String,
-                          style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        Text(
-                          g['sub'] as String,
-                          style: GoogleFonts.poppins(
-                            fontSize: 12,
-                            color: Colors.white.withOpacity(0.85),
-                          ),
-                        ),
-                      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final useTwoColumns = constraints.maxWidth >= 760;
+        final cardWidth = useTwoColumns
+            ? (constraints.maxWidth - 12) / 2
+            : constraints.maxWidth;
+
+        return Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: games.map((g) {
+            return SizedBox(
+              width: cardWidth,
+              child: GestureDetector(
+                onTap: () => _navigateToGame(g['screen'] as Widget),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: g['colors'] as List<Color>,
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
                     ),
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: (g['colors'] as List<Color>)[0].withOpacity(0.3),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
-                  const Icon(
-                    Icons.arrow_forward_ios,
-                    color: Colors.white70,
-                    size: 18,
+                  child: Row(
+                    children: [
+                      Text(
+                        g['icon'] as String,
+                        style: const TextStyle(fontSize: 32),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              g['title'] as String,
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            Text(
+                              g['sub'] as String,
+                              style: GoogleFonts.poppins(
+                                fontSize: 12,
+                                color: Colors.white.withOpacity(0.85),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(
+                        Icons.arrow_forward_ios,
+                        color: Colors.white70,
+                        size: 18,
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
+            );
+          }).toList(),
         );
-      }).toList(),
+      },
     );
   }
 
