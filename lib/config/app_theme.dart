@@ -17,20 +17,13 @@ class AppTheme {
   static const Color birthdayTextPrimary = Color(0xFFFFFFFF); // White
   static const Color birthdayTextAccent = Color(0xFFFCD34D); // Warm Yellow
 
-  // Normal Mode Colors (Lighter Purple & Orange)
-  static const Color normalPurplePrimary = Color(0xFFC084FC); // Light Purple
-  static const Color normalPurpleLight = Color(0xFFE9D5FF); // Very Light Purple
-  static const Color normalPurpleDark = Color(0xFFA855F7); // Medium Purple
-  static const Color normalOrangePrimary = Color(0xFFFFA500); // Light Orange
-  static const Color normalOrangeLight = Color(0xFFFFD699); // Very Light Orange
-  static const Color normalOrangeDark = Color(0xFFFF8C00); // Medium Orange
-  static const Color normalBackground = Color(0xFFFAF5FF); // Very Light Purple-tinted
+  // Normal Mode Colors (Blue & Green)
+  static const Color normalBluePrimary = Color(0xFF3B82F6); // Blue
+  static const Color normalGreenPrimary = Color(0xFF10B981); // Green
+  static const Color normalBackground = Color(0xFFF3F4F6); // Light Gray
   static const Color normalCardBg = Color(0xFFFFFFFF); // White
-  static const Color normalTextPrimary = Color(0xFF2D1B4E); // Dark Purple-ish
-  static const Color normalAccent = Color(0xFFFFA500); // Orange
-  // Kept for backwards compatibility
-  static const Color normalBluePrimary = Color(0xFFC084FC);
-  static const Color normalGreenPrimary = Color(0xFFA855F7);
+  static const Color normalTextPrimary = Color(0xFF111827); // Almost Black
+  static const Color normalAccent = Color(0xFF6366F1); // Indigo
 
   // Common Colors
   static const Color error = Color(0xFFEF4444);
@@ -55,7 +48,7 @@ class AppTheme {
   static const LinearGradient normalGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [normalPurplePrimary, normalOrangePrimary],
+    colors: [normalBluePrimary, normalGreenPrimary],
   );
 
   /// Get Birthday Mode theme
@@ -115,11 +108,11 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      primaryColor: normalPurplePrimary,
+      primaryColor: normalBluePrimary,
       scaffoldBackgroundColor: normalBackground,
       colorScheme: const ColorScheme.light(
-        primary: normalPurplePrimary,
-        secondary: normalOrangePrimary,
+        primary: normalBluePrimary,
+        secondary: normalGreenPrimary,
         surface: normalCardBg,
         error: error,
       ),
@@ -133,7 +126,7 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: normalPurpleDark,
+          backgroundColor: normalBluePrimary,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
           shape: RoundedRectangleBorder(
@@ -155,7 +148,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: normalOrangePrimary, width: 2),
+          borderSide: const BorderSide(color: normalBluePrimary, width: 2),
         ),
       ),
     );

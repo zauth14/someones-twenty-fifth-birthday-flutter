@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
-import '../../config/game_data.dart';
 
 /// Fun personality-style quiz section (BuzzFeed-inspired but unique UI)
 class QuizTimeScreen extends StatefulWidget {
@@ -13,7 +12,138 @@ class QuizTimeScreen extends StatefulWidget {
 }
 
 class _QuizTimeScreenState extends State<QuizTimeScreen> {
-  late List<Map<String, dynamic>> quizzes;
+  // Multiple quizzes — each with questions and a result mapping
+  final List<Map<String, dynamic>> quizzes = [
+    {
+      'title': 'Which Dessert Are You?',
+      'emoji': '🍰',
+      'questions': [
+        {
+          'q': 'Pick a weekend vibe:',
+          'options': [
+            'Beach day',
+            'Movie marathon',
+            'Road trip',
+            'Cooking at home',
+          ],
+        },
+        {
+          'q': 'Choose a color palette:',
+          'options': [
+            'Sunset orange',
+            'Ocean blue',
+            'Forest green',
+            'Berry pink',
+          ],
+        },
+        {
+          'q': 'Your go-to drink:',
+          'options': [
+            'Iced coffee',
+            'Smoothie',
+            'Hot chocolate',
+            'Sparkling water',
+          ],
+        },
+        {
+          'q': 'Pick a superpower:',
+          'options': ['Time travel', 'Invisibility', 'Flying', 'Mind reading'],
+        },
+      ],
+      'results': [
+        'You\'re a classic Tiramisu — layered, elegant, and unforgettable!',
+        'You\'re a warm Brownie — rich, comforting, and loved by everyone!',
+        'You\'re a colorful Macaron — unique, trendy, and full of surprises!',
+        'You\'re a refreshing Sorbet — vibrant, light, and always uplifting!',
+      ],
+    },
+    {
+      'title': 'What\'s Your Party Anthem?',
+      'emoji': '🎶',
+      'questions': [
+        {
+          'q': 'Pick a dance move:',
+          'options': ['The Spin', 'The Shimmy', 'The Dip', 'Free-style chaos'],
+        },
+        {
+          'q': 'Your ideal party size:',
+          'options': [
+            'Just my crew (5-8)',
+            'Medium bash (20-30)',
+            'Huge blowout (50+)',
+            'One-on-one hangout',
+          ],
+        },
+        {
+          'q': 'What are you doing at a party?',
+          'options': [
+            'Dancing non-stop',
+            'By the snack table',
+            'Telling stories',
+            'Taking photos',
+          ],
+        },
+        {
+          'q': 'Choose a party theme:',
+          'options': ['Retro disco', 'Garden party', 'Masquerade', 'Neon glow'],
+        },
+      ],
+      'results': [
+        'Your anthem is "Dancing Queen" — you own every dance floor!',
+        'Your anthem is "Good as Hell" — confident and unstoppable!',
+        'Your anthem is "Mr. Brightside" — you bring the energy!',
+        'Your anthem is "Levitating" — smooth, groovy, and magnetic!',
+      ],
+    },
+    {
+      'title': 'What Kind of Friend Are You?',
+      'emoji': '💛',
+      'questions': [
+        {
+          'q': 'A friend calls at 2 AM — you:',
+          'options': [
+            'Answer immediately',
+            'Text "you ok?"',
+            'Call back in the morning',
+            'Show up at their door',
+          ],
+        },
+        {
+          'q': 'Your friend group role:',
+          'options': [
+            'The planner',
+            'The hype person',
+            'The therapist',
+            'The wildcard',
+          ],
+        },
+        {
+          'q': 'Pick a friendship activity:',
+          'options': [
+            'Brunch',
+            'Karaoke night',
+            'Deep talks on a drive',
+            'Spontaneous adventure',
+          ],
+        },
+        {
+          'q': 'Your love language with friends:',
+          'options': [
+            'Words of affirmation',
+            'Quality time',
+            'Acts of service',
+            'Gifts & surprises',
+          ],
+        },
+      ],
+      'results': [
+        'You\'re The Rock — reliable, strong, and always there!',
+        'You\'re The Hype Machine — you lift everyone\'s spirits!',
+        'You\'re The Sage — wise, caring, and everyone\'s safe space!',
+        'You\'re The Spark — spontaneous, fun, and full of life!',
+      ],
+    },
+  ];
 
   int currentQuizIndex = 0;
   int currentQuestionIndex = 0;
@@ -26,7 +156,6 @@ class _QuizTimeScreenState extends State<QuizTimeScreen> {
   @override
   void initState() {
     super.initState();
-    quizzes = GameData.getQuizzes(widget.isBirthdayMode);
     currentQuiz = quizzes[Random().nextInt(quizzes.length)];
   }
 
@@ -73,12 +202,11 @@ class _QuizTimeScreenState extends State<QuizTimeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isBday = widget.isBirthdayMode;
-    final bgTop = isBday ? const Color(0xFF1A0A2E) : const Color(0xFFFAF5FF);
-    final bgBottom = isBday ? const Color(0xFF2D1B4E) : const Color(0xFFF3E8FF);
-    final accentOrange = isBday ? const Color(0xFFFF8C42) : const Color(0xFFFFA500);
-    final accentGold = isBday ? const Color(0xFFFFD166) : const Color(0xFFFFD166);
-    final tileBase = isBday ? const Color(0xFF3B1F6E) : const Color(0xFFE9D5FF);
+    const bgTop = Color(0xFF1A0A2E);
+    const bgBottom = Color(0xFF2D1B4E);
+    const accentOrange = Color(0xFFFF8C42);
+    const accentGold = Color(0xFFFFD166);
+    const tileBase = Color(0xFF3B1F6E);
 
     return Scaffold(
       appBar: AppBar(
@@ -86,12 +214,10 @@ class _QuizTimeScreenState extends State<QuizTimeScreen> {
         automaticallyImplyLeading: true,
         elevation: 0,
         backgroundColor: bgTop,
-        iconTheme: IconThemeData(
-          color: isBday ? Colors.white70 : Colors.purple.shade400,
-        ),
+        iconTheme: const IconThemeData(color: Colors.white70),
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -110,20 +236,17 @@ class _QuizTimeScreenState extends State<QuizTimeScreen> {
   }
 
   Widget _buildQuizMenu(Color accentOrange, Color accentGold, Color tileBase) {
-    final isBday = widget.isBirthdayMode;
-    final textPrimary = isBday ? Colors.white : const Color(0xFF2D1B4E);
-    final textMuted = isBday ? Colors.white.withOpacity(0.5) : Colors.purple.shade300;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'Pick a Quiz',
             style: TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.w900,
-              color: textPrimary,
+              color: Colors.white,
             ),
           ),
           const SizedBox(height: 6),
@@ -131,7 +254,7 @@ class _QuizTimeScreenState extends State<QuizTimeScreen> {
             'Tap one to find out something fun!',
             style: TextStyle(
               fontSize: 14,
-              color: textMuted,
+              color: Colors.white.withOpacity(0.5),
             ),
           ),
           const SizedBox(height: 24),
@@ -160,10 +283,10 @@ class _QuizTimeScreenState extends State<QuizTimeScreen> {
                       Expanded(
                         child: Text(
                           quiz['title'] as String,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w700,
-                            color: textPrimary,
+                            color: Colors.white,
                           ),
                         ),
                       ),
@@ -184,9 +307,6 @@ class _QuizTimeScreenState extends State<QuizTimeScreen> {
   }
 
   Widget _buildQuestion(Color accentOrange, Color accentGold, Color tileBase) {
-    final isBday = widget.isBirthdayMode;
-    final textPrimary = isBday ? Colors.white : const Color(0xFF2D1B4E);
-    final textMuted = isBday ? Colors.white38 : Colors.purple.shade200;
     final questions = currentQuiz['questions'] as List;
     final question = questions[currentQuestionIndex] as Map<String, dynamic>;
     final options = question['options'] as List;
@@ -208,7 +328,7 @@ class _QuizTimeScreenState extends State<QuizTimeScreen> {
                   decoration: BoxDecoration(
                     color: i <= currentQuestionIndex
                         ? accentOrange
-                        : (widget.isBirthdayMode ? Colors.white24 : Colors.purple.shade100),
+                        : Colors.white24,
                     borderRadius: BorderRadius.circular(5),
                   ),
                 ),
@@ -218,8 +338,8 @@ class _QuizTimeScreenState extends State<QuizTimeScreen> {
           const SizedBox(height: 10),
           Text(
             '${currentQuiz['emoji']}  ${currentQuiz['title']}',
-            style: TextStyle(
-              color: textMuted,
+            style: const TextStyle(
+              color: Colors.white38,
               fontSize: 13,
               fontWeight: FontWeight.w600,
             ),
@@ -229,10 +349,10 @@ class _QuizTimeScreenState extends State<QuizTimeScreen> {
           // Question
           Text(
             question['q'] as String,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w800,
-              color: textPrimary,
+              color: Colors.white,
             ),
             textAlign: TextAlign.center,
           ),
@@ -258,7 +378,7 @@ class _QuizTimeScreenState extends State<QuizTimeScreen> {
                       width: 1.5,
                     ),
                     backgroundColor: tileBase.withOpacity(0.6),
-                    foregroundColor: textPrimary,
+                    foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -281,8 +401,6 @@ class _QuizTimeScreenState extends State<QuizTimeScreen> {
   }
 
   Widget _buildResult(Color accentOrange, Color accentGold, Color tileBase) {
-    final textPrimary = widget.isBirthdayMode ? Colors.white : const Color(0xFF2D1B4E);
-    final textMuted = widget.isBirthdayMode ? Colors.white54 : Colors.purple.shade300;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       child: Column(
@@ -312,10 +430,10 @@ class _QuizTimeScreenState extends State<QuizTimeScreen> {
             ),
             child: Text(
               result!,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
-                color: textPrimary,
+                color: Colors.white,
                 height: 1.5,
               ),
               textAlign: TextAlign.center,
@@ -344,7 +462,7 @@ class _QuizTimeScreenState extends State<QuizTimeScreen> {
           TextButton(
             onPressed: () => Navigator.pop(context),
             style: TextButton.styleFrom(
-              foregroundColor: textMuted,
+              foregroundColor: Colors.white54,
               textStyle: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w500,

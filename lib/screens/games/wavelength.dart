@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../config/game_data.dart';
 
 class WavelengthScreen extends StatefulWidget {
   final bool isBirthdayMode;
@@ -11,18 +10,48 @@ class WavelengthScreen extends StatefulWidget {
 }
 
 class _WavelengthScreenState extends State<WavelengthScreen> {
-  late List<Map<String, dynamic>> prompts;
+  final List<Map<String, dynamic>> prompts = [
+    {
+      'left': 'Hot',
+      'right': 'Cold',
+      'answer': 'Temperature',
+      'hint': 'Temperature',
+      'target': 0.2,
+    },
+    {
+      'left': 'Love',
+      'right': 'Hate',
+      'answer': 'Emotion',
+      'hint': 'Emotion',
+      'target': 0.8,
+    },
+    {
+      'left': 'Morning',
+      'right': 'Night',
+      'answer': 'Time of Day',
+      'hint': 'Time of Day',
+      'target': 0.3,
+    },
+    {
+      'left': 'Fast',
+      'right': 'Slow',
+      'answer': 'Speed',
+      'hint': 'Speed',
+      'target': 0.1,
+    },
+    {
+      'left': 'Happy',
+      'right': 'Sad',
+      'answer': 'Mood',
+      'hint': 'Mood',
+      'target': 0.4,
+    },
+  ];
 
   int currentPromptIndex = 0;
   double sliderValue = 0.5;
   bool revealed = false;
   int score = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    prompts = GameData.getWavelengthPrompts(widget.isBirthdayMode);
-  }
 
   void _nextPrompt() {
     if (currentPromptIndex < prompts.length - 1) {
@@ -46,37 +75,32 @@ class _WavelengthScreenState extends State<WavelengthScreen> {
   }
 
   void _showGameOver() {
-    final isBday = widget.isBirthdayMode;
-    final accentOrange = isBday ? const Color(0xFFFF8C42) : const Color(0xFFFFA500);
-    final dialogBg = isBday ? const Color(0xFF2D1B4E) : Colors.white;
-    final dialogText = isBday ? Colors.white : const Color(0xFF2D1B4E);
-    final dialogSub = isBday ? Colors.white70 : Colors.grey.shade600;
+    const accentOrange = Color(0xFFFF8C42);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: dialogBg,
+        backgroundColor: const Color(0xFF2D1B4E),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: Text(
+        title: const Text(
           'Round Complete!',
-          style: TextStyle(color: dialogText, fontWeight: FontWeight.w800),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
         ),
         content: Text(
           'Your score: $score / ${prompts.length * 4}',
-          style: TextStyle(color: dialogSub, fontSize: 16),
+          style: const TextStyle(color: Colors.white70, fontSize: 16),
         ),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               setState(() {
-                prompts = GameData.getWavelengthPrompts(widget.isBirthdayMode);
                 currentPromptIndex = 0;
                 sliderValue = 0.5;
                 revealed = false;
                 score = 0;
               });
             },
-            child: Text(
+            child: const Text(
               'Play Again',
               style: TextStyle(
                 color: accentOrange,
@@ -95,16 +119,12 @@ class _WavelengthScreenState extends State<WavelengthScreen> {
     final double target = prompt['target'] ?? 0.5;
     final String hint = prompt['hint'] ?? '';
 
-    final isBday = widget.isBirthdayMode;
-    final bgTop = isBday ? const Color(0xFF1A0A2E) : const Color(0xFFFAF5FF);
-    final bgBottom = isBday ? const Color(0xFF2D1B4E) : const Color(0xFFF3E8FF);
-    final accentOrange = isBday ? const Color(0xFFFF8C42) : const Color(0xFFFFA500);
-    final accentRose = isBday ? const Color(0xFFFB7185) : const Color(0xFFFF6B6B);
-    final accentGold = isBday ? const Color(0xFFFFD166) : const Color(0xFFFFD166);
-    final tileBase = isBday ? const Color(0xFF3B1F6E) : const Color(0xFFE9D5FF);
-    final textPrimary = isBday ? Colors.white : const Color(0xFF2D1B4E);
-    final textMuted = isBday ? Colors.white38 : Colors.purple.shade300;
-    final textSubtle = isBday ? Colors.white24 : Colors.purple.shade100;
+    const bgTop = Color(0xFF1A0A2E);
+    const bgBottom = Color(0xFF2D1B4E);
+    const accentOrange = Color(0xFFFF8C42);
+    const accentRose = Color(0xFFFB7185);
+    const accentGold = Color(0xFFFFD166);
+    const tileBase = Color(0xFF3B1F6E);
 
     final int pts = _calculatePoints(sliderValue, target);
 
@@ -114,12 +134,10 @@ class _WavelengthScreenState extends State<WavelengthScreen> {
         automaticallyImplyLeading: true,
         elevation: 0,
         backgroundColor: bgTop,
-        iconTheme: IconThemeData(
-          color: isBday ? Colors.white70 : Colors.purple.shade400,
-        ),
+        iconTheme: const IconThemeData(color: Colors.white70),
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -139,9 +157,9 @@ class _WavelengthScreenState extends State<WavelengthScreen> {
                     if (i < currentPromptIndex) {
                       dotColor = accentOrange;
                     } else if (i == currentPromptIndex) {
-                      dotColor = textPrimary;
+                      dotColor = Colors.white;
                     } else {
-                      dotColor = textSubtle;
+                      dotColor = Colors.white24;
                     }
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -160,8 +178,8 @@ class _WavelengthScreenState extends State<WavelengthScreen> {
                 const SizedBox(height: 8),
                 Text(
                   'Score: $score',
-                  style: TextStyle(
-                    color: textMuted,
+                  style: const TextStyle(
+                    color: Colors.white38,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
@@ -186,16 +204,16 @@ class _WavelengthScreenState extends State<WavelengthScreen> {
                       children: [
                         const Icon(
                           Icons.lightbulb_outline,
-                          color: Color(0xFFFFD166),
+                          color: accentGold,
                           size: 18,
                         ),
                         const SizedBox(width: 8),
                         Text(
                           hint,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 15,
                             fontStyle: FontStyle.italic,
-                            color: isBday ? Colors.white70 : Colors.purple.shade400,
+                            color: Colors.white70,
                           ),
                         ),
                       ],
@@ -224,7 +242,7 @@ class _WavelengthScreenState extends State<WavelengthScreen> {
                         ),
                         child: Text(
                           prompt['left'],
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
                             color: accentRose,
@@ -245,7 +263,7 @@ class _WavelengthScreenState extends State<WavelengthScreen> {
                         ),
                         child: Text(
                           prompt['right'],
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
                             color: accentOrange,
@@ -268,7 +286,7 @@ class _WavelengthScreenState extends State<WavelengthScreen> {
                         height: 8,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(4),
-                          gradient: LinearGradient(
+                          gradient: const LinearGradient(
                             colors: [accentRose, accentGold, accentOrange],
                           ),
                         ),
@@ -293,7 +311,7 @@ class _WavelengthScreenState extends State<WavelengthScreen> {
                               const Text(
                                 'TARGET',
                                 style: TextStyle(
-                                  color: Colors.black87,
+                                  color: Colors.white,
                                   fontSize: 9,
                                   fontWeight: FontWeight.w800,
                                   letterSpacing: 1.5,

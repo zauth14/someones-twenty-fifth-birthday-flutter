@@ -4,10 +4,14 @@ import 'package:google_fonts/google_fonts.dart';
 import '../config/app_theme.dart';
 import '../config/user_config.dart';
 import 'games/buzzfeed_quiz.dart';
+import 'games/lyrics_screen.dart';
 import 'games/wordle.dart';
 import 'games/wavelength.dart';
 import 'games/connections.dart';
 import 'games/quiz_time.dart';
+import 'game_intro_screen.dart';
+
+// ─── Main Birthday Screen ─────────────────────────────────────────────────────
 
 class BirthdayModeScreen extends StatefulWidget {
   const BirthdayModeScreen({super.key});
@@ -18,265 +22,103 @@ class BirthdayModeScreen extends StatefulWidget {
 
 class _BirthdayModeScreenState extends State<BirthdayModeScreen>
     with TickerProviderStateMixin {
-  late AnimationController _confettiController;
-  late AnimationController _glowController;
-
-  // Spin the wheel state
-  late AnimationController _wheelController;
-  double _wheelAngle = 0;
-  bool _isSpinning = false;
-  String? _wheelResult;
-
-  // Rewards tracking
-  int _gamesPlayed = 0;
-  final List<String> _unlockedRewards = [];
-
-  final List<Map<String, String>> _wheelItems = [
-    {'label': '🎁 Mystery Gift', 'color': 'purple'},
-    {'label': '🎵 Song Dedication', 'color': 'orange'},
-    {'label': '📸 Memory Photo', 'color': 'purple'},
-    {'label': '🍰 Cake Flavor Pick', 'color': 'orange'},
-    {'label': '⭐ Birthday Wish', 'color': 'purple'},
-    {'label': '🎉 Party Dance', 'color': 'orange'},
-  ];
+  late AnimationController _confettiCtrl;
+  late AnimationController _glowCtrl;
+  late AnimationController _entranceCtrl;
 
   @override
   void initState() {
     super.initState();
-    _confettiController = AnimationController(
-      duration: const Duration(seconds: 4),
+
+    _confettiCtrl = AnimationController(
+      duration: const Duration(seconds: 5),
       vsync: this,
     )..repeat();
 
-    _glowController = AnimationController(
+    _glowCtrl = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
     )..repeat(reverse: true);
 
-    _wheelController = AnimationController(
-      duration: const Duration(seconds: 3),
+    _entranceCtrl = AnimationController(
+      duration: const Duration(milliseconds: 1400),
       vsync: this,
-    );
-    _wheelController.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        setState(() {
-          _isSpinning = false;
-          final idx =
-              ((_wheelAngle / (2 * pi)) * _wheelItems.length).floor() %
-              _wheelItems.length;
-          _wheelResult = _wheelItems[idx]['label'];
-        });
-      }
-    });
+    )..forward();
   }
 
   @override
   void dispose() {
-    _confettiController.dispose();
-    _glowController.dispose();
-    _wheelController.dispose();
+    _confettiCtrl.dispose();
+    _glowCtrl.dispose();
+    _entranceCtrl.dispose();
     super.dispose();
   }
 
-  void _spinWheel() {
-    if (_isSpinning) return;
-    setState(() {
-      _isSpinning = true;
-      _wheelResult = null;
-    });
-    final spins = 3 + Random().nextInt(3);
-    final extra = Random().nextDouble() * 2 * pi;
-    _wheelAngle = spins * 2 * pi + extra;
-    _wheelController.reset();
-    _wheelController.forward();
-  }
-
-  void _navigateToGame(Widget game) {
-    Navigator.of(context)
-        .push(
-          PageRouteBuilder(
-            transitionDuration: const Duration(milliseconds: 520),
-            pageBuilder: (context, animation, secondaryAnimation) => game,
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-                  final curved = CurvedAnimation(
-                    parent: animation,
-                    curve: Curves.easeOutCubic,
-                  );
-                  return FadeTransition(
-                    opacity: curved,
-                    child: SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(0.06, 0),
-                        end: Offset.zero,
-                      ).animate(curved),
-                      child: child,
-                    ),
-                  );
-                },
-          ),
-        )
-        .then((_) {
-          setState(() {
-            _gamesPlayed++;
-            if (_gamesPlayed == 1 &&
-                !_unlockedRewards.contains('🏅 First Game')) {
-              _unlockedRewards.add('🏅 First Game');
-            }
-            if (_gamesPlayed >= 3 &&
-                !_unlockedRewards.contains('⭐ Trivia Master')) {
-              _unlockedRewards.add('⭐ Trivia Master');
-            }
-            if (_gamesPlayed >= 4 &&
-                !_unlockedRewards.contains('🎉 Game Champion')) {
-              _unlockedRewards.add('🎉 Game Champion');
-            }
-          });
-        });
+  Animation<double> _cardAnim(int i) {
+    final start = (i * 0.08).clamp(0.0, 0.7);
+    final end = (start + 0.45).clamp(0.0, 1.0);
+    return CurvedAnimation(
+      parent: _entranceCtrl,
+      curve: Interval(start, end, curve: Curves.easeOutCubic),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        // Full-screen purple-to-orange gradient
+        // Background gradient
         Positioned.fill(
           child: Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
                 colors: [
-                  AppTheme.birthdayPurplePrimary,
-                  AppTheme.birthdayBackground,
+                  Color(0xFF1C0D33),
+                  Color(0xFF24103D),
+                  Color(0xFF1F1B29),
+                  Color(0xFF2A1200),
                 ],
+                stops: [0.0, 0.35, 0.65, 1.0],
               ),
             ),
           ),
         ),
 
-        // Confetti
+        // Confetti layer — RepaintBoundary isolates repaints to this layer only
         Positioned.fill(
-          child: AnimatedBuilder(
-            animation: _confettiController,
-            builder: (context, child) {
-              return CustomPaint(
-                painter: BirthdayConfettiPainter(_confettiController.value),
-              );
-            },
+          child: RepaintBoundary(
+            child: AnimatedBuilder(
+              animation: _confettiCtrl,
+              builder:
+                  (_, __) => CustomPaint(
+                    painter: BirthdayConfettiPainter(_confettiCtrl.value),
+                  ),
+            ),
           ),
         ),
 
-        // Scrollable Content
+        // Scrollable content
         Positioned.fill(
           child: LayoutBuilder(
             builder: (context, constraints) {
-              final horizontalPadding =
-                  constraints.maxWidth >= 1000 ? 28.0 : 20.0;
-
+              final hPad = constraints.maxWidth >= 1000 ? 32.0 : 18.0;
               return SingleChildScrollView(
-                padding: EdgeInsets.fromLTRB(
-                  horizontalPadding,
-                  8,
-                  horizontalPadding,
-                  30,
-                ),
+                padding: EdgeInsets.fromLTRB(hPad, 12, hPad, 40),
                 child: Center(
                   child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 980),
+                    constraints: const BoxConstraints(maxWidth: 900),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                // Birthday Header
-                Text(
-                  UserConfig.birthdayGreeting,
-                  style: GoogleFonts.poppins(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    shadows: [
-                      Shadow(
-                        color: Colors.black.withOpacity(0.3),
-                        offset: const Offset(0, 2),
-                        blurRadius: 8,
-                      ),
-                    ],
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  UserConfig.birthdaySubtitle,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: AppTheme.birthdayTextAccent,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-
-                const SizedBox(height: 28),
-
-                // ─── SECTION 1: TRIVIA ───
-                _buildSectionHeader('🧠', 'Birthday Trivia'),
-                const SizedBox(height: 12),
-                _buildTriviaCard(),
-
-                const SizedBox(height: 28),
-
-                // ─── SECTION 2: SPIN THE WHEEL ───
-                _buildSectionHeader('🎡', 'Spin the Wheel'),
-                const SizedBox(height: 12),
-                _buildSpinWheel(),
-
-                const SizedBox(height: 28),
-
-                // ─── SECTION 3: GAMES ───
-                _buildSectionHeader('🎮', 'Birthday Games'),
-                const SizedBox(height: 12),
-                _buildGamesGrid(),
-
-                const SizedBox(height: 28),
-
-                // ─── SECTION 4: REWARDS ───
-                _buildSectionHeader('🏆', 'Rewards'),
-                const SizedBox(height: 12),
-                _buildRewardsSection(),
-
-                const SizedBox(height: 20),
-
-                        // Footer
-                        AnimatedBuilder(
-                          animation: _glowController,
-                          builder: (context, child) {
-                            return Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 12,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(
-                                  0.1 + 0.05 * _glowController.value,
-                                ),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: AppTheme.birthdayTextAccent
-                                      .withOpacity(0.4),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Text(
-                                '✨ All personalized just for ${UserConfig.birthdayPersonName}! ✨',
-                                style: GoogleFonts.poppins(
-                                  color: Colors.white,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            );
-                          },
-                        ),
+                        _buildHeader(),
+                        const SizedBox(height: 32),
+                        _buildSectionLabel(),
+                        const SizedBox(height: 16),
+                        _buildCardsGrid(),
+                        const SizedBox(height: 28),
+                        _buildFooter(),
                       ],
                     ),
                   ),
@@ -289,514 +131,565 @@ class _BirthdayModeScreenState extends State<BirthdayModeScreen>
     );
   }
 
-  // ─── Section Header ───
-  Widget _buildSectionHeader(String emoji, String title) {
-    return Row(
-      children: [
-        Text(emoji, style: const TextStyle(fontSize: 22)),
-        const SizedBox(width: 8),
-        Text(
-          title,
-          style: GoogleFonts.poppins(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
+  // ─── Header ────────────────────────────────────────────────────────────────
+
+  Widget _buildHeader() {
+    return AnimatedBuilder(
+      animation: _glowCtrl,
+      builder:
+          (_, __) => Column(
+            children: [
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(7, (i) {
+                  final pulse =
+                      i % 2 == 0 ? _glowCtrl.value : 1 - _glowCtrl.value;
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 3),
+                    child: Text(
+                      i == 3 ? '✦' : '✧',
+                      style: TextStyle(
+                        color: AppTheme.birthdayTextAccent.withOpacity(
+                          0.3 + 0.4 * pulse,
+                        ),
+                        fontSize: i == 3 ? 18 : 12,
+                      ),
+                    ),
+                  );
+                }),
+              ),
+              const SizedBox(height: 14),
+              const Text('🎉', style: TextStyle(fontSize: 56)),
+              const SizedBox(height: 14),
+              ShaderMask(
+                shaderCallback:
+                    (bounds) => const LinearGradient(
+                      colors: [
+                        AppTheme.birthdayPurpleLight,
+                        Color(0xFFFBD38D),
+                        AppTheme.birthdayOrangeLight,
+                      ],
+                    ).createShader(bounds),
+                child: Text(
+                  'Happy 25th Birthday, ${UserConfig.birthdayPersonName}!',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                    fontSize: 34,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                ' ✨',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.birthdayTextAccent.withOpacity(0.85),
+                  letterSpacing: 0.2,
+                ),
+              ),
+            ],
           ),
-        ),
-      ],
     );
   }
 
-  // ─── TRIVIA Section ───
-  Widget _buildTriviaCard() {
-    return GestureDetector(
-      onTap: () => _navigateToGame(TenThingsScreen(isBirthdayMode: true)),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [
-              AppTheme.birthdayPurpleDark,
-              AppTheme.birthdayPurplePrimary,
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+  // ─── Section label ─────────────────────────────────────────────────────────
+
+  Widget _buildSectionLabel() {
+    return AnimatedBuilder(
+      animation: _entranceCtrl,
+      builder: (_, child) {
+        final v = CurvedAnimation(
+          parent: _entranceCtrl,
+          curve: const Interval(0.0, 0.3, curve: Curves.easeOut),
+        ).value;
+        return Opacity(
+          opacity: v,
+          child: Transform.translate(
+            offset: Offset(0, 16 * (1 - v)),
+            child: child,
           ),
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: AppTheme.birthdayPurplePrimary.withOpacity(0.4),
-              blurRadius: 16,
-              offset: const Offset(0, 6),
+        );
+      },
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 40,
+            height: 1,
+            color: Colors.white.withOpacity(0.15),
+          ),
+          const SizedBox(width: 10),
+          Text(
+            '🎮  pick your game',
+            style: GoogleFonts.poppins(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: Colors.white.withOpacity(0.45),
+              letterSpacing: 2.5,
             ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Text('💭', style: TextStyle(fontSize: 28)),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '10 Things I (Don\'t) Hate About You',
-                        style: GoogleFonts.poppins(
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Answer fun personalized trivia questions!',
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          color: Colors.white.withOpacity(0.85),
-                        ),
-                      ),
-                    ],
-                  ),
+          ),
+          const SizedBox(width: 10),
+          Container(
+            width: 40,
+            height: 1,
+            color: Colors.white.withOpacity(0.15),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ─── Cards grid ────────────────────────────────────────────────────────────
+
+  static const _cardDefs = [
+    {
+      'icon': '💭',
+      'title': '10 Things I (don\'t) Hate about You',
+      'subtitle': 'Yes, this time, I will play along and boost your ego',
+      'action': 'Start',
+      'g1': Color(0xFF5B21B6),
+      'g2': Color(0xFF3B0D8E),
+    },
+    {
+      'icon': '🎵',
+      'title': 'Songs for You',
+      'subtitle': 'lyrics that remind me of you',
+      'action': 'Open',
+      'g1': Color(0xFF92400E),
+      'g2': Color(0xFF78350F),
+    },
+    {
+      'icon': '🔤',
+      'title': 'Word Puzzle',
+      'subtitle': '5-letter birthday challenge',
+      'action': 'Play',
+      'g1': Color(0xFF7C3AED),
+      'g2': Color(0xFF5B21B6),
+    },
+    {
+      'icon': '〰️',
+      'title': 'Spectrum',
+      'subtitle': 'guess ${UserConfig.birthdayPersonName}\'s vibe',
+      'action': 'Play',
+      'g1': Color(0xFF9333EA),
+      'g2': Color(0xFFEA580C),
+    },
+    {
+      'icon': '🔗',
+      'title': 'Link Game',
+      'subtitle': 'find the matching groups',
+      'action': 'Play',
+      'g1': Color(0xFFEA580C),
+      'g2': Color(0xFF9333EA),
+    },
+    {
+      'icon': '🧠',
+      'title': 'Quiz Time',
+      'subtitle': 'fun personality quizzes',
+      'action': 'Play',
+      'g1': Color(0xFFF97316),
+      'g2': Color(0xFFEA580C),
+    },
+  ];
+
+  Widget _buildCardsGrid() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final columns =
+            constraints.maxWidth >= 900
+                ? 3
+                : constraints.maxWidth >= 580
+                ? 2
+                : 1;
+        const spacing = 14.0;
+        final cardWidth =
+            (constraints.maxWidth - spacing * (columns - 1)) / columns;
+
+        final cardWidgets = <Widget>[];
+        for (int i = 0; i < _cardDefs.length; i++) {
+          final def = _cardDefs[i];
+          cardWidgets.add(
+            SizedBox(
+              width: cardWidth,
+              height: 240,
+              child: _GameCard(
+                icon: def['icon'] as String,
+                title: def['title'] as String,
+                subtitle: def['subtitle'] as String,
+                actionText: def['action'] as String,
+                gradientColors: [def['g1'] as Color, def['g2'] as Color],
+                entrance: _cardAnim(i),
+                onTap: () => _handleCardTap(i),
+              ),
+            ),
+          );
+        }
+
+        return Wrap(spacing: spacing, runSpacing: spacing, children: cardWidgets);
+      },
+    );
+  }
+
+  // Placeholder intro phases — fill these in with your own words!
+  static const _introPhases = [
+    // 0 – 10 Things
+    [
+      'okay so...',
+      'you know how I am TERRIBLE at giving you compliments, right?',
+      'this is an attempt to fix that. Don\'t get used to it though.',
+    ],
+    // 1 – Songs for You
+    [
+      'music has a way of saying things...',
+      'that words alone can\'t quite capture.',
+      'these songs remind me of you.',
+    ],
+    // 2 – Word Puzzle
+    [
+      '5 letters.',
+      '6 tries.',
+      'one of us will walk away humbled.',
+    ],
+    // 3 – Spectrum
+    [
+      'somewhere on a scale of...',
+      'hot to cold. fast to slow.',
+      'where do you think you land?',
+    ],
+    // 4 – Link Game
+    [
+      'everything is connected.',
+      'some more obviously than others.',
+      'good luck.',
+    ],
+    // 5 – Quiz Time
+    [
+      'who are you, really?',
+      'science (or buzzfeed) might have the answer.',
+      'but I DEFINITELY have the answer',
+    ],
+  ];
+
+  void _handleCardTap(int i) {
+    final Widget game;
+    final List<String> phases;
+    final Color accentColor;
+
+    switch (i) {
+      case 0:
+        game = TenThingsScreen(isBirthdayMode: true);
+        phases = List<String>.from(_introPhases[0]);
+        accentColor = const Color(0xFF5B21B6);
+        break;
+      case 1:
+        game = const LyricsScreen(isBirthdayMode: true);
+        phases = List<String>.from(_introPhases[1]);
+        accentColor = const Color(0xFF92400E);
+        break;
+      case 2:
+        game = const WordleScreen(isBirthdayMode: true);
+        phases = List<String>.from(_introPhases[2]);
+        accentColor = const Color(0xFF7C3AED);
+        break;
+      case 3:
+        game = const WavelengthScreen(isBirthdayMode: true);
+        phases = List<String>.from(_introPhases[3]);
+        accentColor = const Color(0xFF9333EA);
+        break;
+      case 4:
+        game = const ConnectionsScreen(isBirthdayMode: true);
+        phases = List<String>.from(_introPhases[4]);
+        accentColor = const Color(0xFFEA580C);
+        break;
+      case 5:
+        game = const QuizTimeScreen(isBirthdayMode: true);
+        phases = List<String>.from(_introPhases[5]);
+        accentColor = const Color(0xFFF97316);
+        break;
+      default:
+        return;
+    }
+
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 280),
+        pageBuilder:
+            (_, __, ___) => GameIntroScreen(
+              phases: phases,
+              game: game,
+              accentColor: accentColor,
+            ),
+        transitionsBuilder:
+            (_, anim, __, child) => FadeTransition(
+              opacity: CurvedAnimation(parent: anim, curve: Curves.easeOut),
+              child: child,
+            ),
+      ),
+    );
+  }
+
+  // ─── Footer ────────────────────────────────────────────────────────────────
+
+  Widget _buildFooter() {
+    return AnimatedBuilder(
+      animation: _glowCtrl,
+      builder:
+          (_, __) => Container(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.07 + 0.04 * _glowCtrl.value),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: AppTheme.birthdayTextAccent.withOpacity(0.25),
+              ),
+              // Static shadow — no per-frame interpolation
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x288B5CF6),
+                  blurRadius: 24,
+                  spreadRadius: -4,
                 ),
               ],
             ),
-            const SizedBox(height: 14),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: AppTheme.birthdayOrangePrimary,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  'Start Trivia →',
-                  style: GoogleFonts.poppins(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
+            child: Text(
+              '✨  Congrats on being old!!  ✨',
+              style: GoogleFonts.poppins(
+                color: Colors.white.withOpacity(0.7),
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                letterSpacing: 0.5,
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ─── SPIN THE WHEEL Section ───
-  Widget _buildSpinWheel() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppTheme.birthdayOrangeDark.withOpacity(0.8),
-            AppTheme.birthdayOrangePrimary.withOpacity(0.6),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: AppTheme.birthdayOrangeLight.withOpacity(0.3),
-        ),
-      ),
-      child: Column(
-        children: [
-          // The Wheel
-          SizedBox(
-            height: 200,
-            width: 200,
-            child: AnimatedBuilder(
-              animation: _wheelController,
-              builder: (context, child) {
-                final curvedValue = Curves.easeOutCubic.transform(
-                  _wheelController.value,
-                );
-                return Transform.rotate(
-                  angle: curvedValue * _wheelAngle,
-                  child: child,
-                );
-              },
-              child: CustomPaint(
-                size: const Size(200, 200),
-                painter: WheelPainter(_wheelItems),
-              ),
+              textAlign: TextAlign.center,
             ),
           ),
-          const SizedBox(height: 16),
-
-          // Result
-          if (_wheelResult != null)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                'You got: $_wheelResult',
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          if (_wheelResult != null) const SizedBox(height: 12),
-
-          // Spin Button
-          GestureDetector(
-            onTap: _isSpinning ? null : _spinWheel,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
-              decoration: BoxDecoration(
-                color: _isSpinning
-                    ? Colors.white.withOpacity(0.3)
-                    : Colors.white,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: _isSpinning
-                    ? []
-                    : [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.15),
-                          blurRadius: 8,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-              ),
-              child: Text(
-                _isSpinning ? 'Spinning...' : '🎡 Spin!',
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: _isSpinning
-                      ? Colors.white60
-                      : AppTheme.birthdayOrangeDark,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
+}
 
-  // ─── GAMES Grid ───
-  Widget _buildGamesGrid() {
-    final games = [
-      {
-        'icon': '🔤',
-        'title': 'Word Puzzle',
-        'sub': '5-letter birthday challenge',
-        'colors': [AppTheme.birthdayOrangePrimary, AppTheme.birthdayOrangeDark],
-        'screen': const WordleScreen(isBirthdayMode: true),
-      },
-      {
-        'icon': '〰️',
-        'title': 'Spectrum',
-        'sub': "Guess ${UserConfig.birthdayPersonName}'s vibe",
-        'colors': [AppTheme.birthdayPurpleDark, AppTheme.birthdayOrangeDark],
-        'screen': const WavelengthScreen(isBirthdayMode: true),
-      },
-      {
-        'icon': '🔗',
-        'title': 'Link Game',
-        'sub': 'Find the matching groups',
-        'colors': [AppTheme.birthdayPurplePrimary, AppTheme.birthdayPurpleDark],
-        'screen': const ConnectionsScreen(isBirthdayMode: true),
-      },
-      {
-        'icon': '🧠',
-        'title': 'Quiz Time',
-        'sub': 'Fun personality quizzes',
-        'colors': [
-          AppTheme.birthdayOrangePrimary,
-          AppTheme.birthdayPurplePrimary,
-        ],
-        'screen': const QuizTimeScreen(isBirthdayMode: true),
-      },
-    ];
+// ─── Game Card ────────────────────────────────────────────────────────────────
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final useTwoColumns = constraints.maxWidth >= 760;
-        final cardWidth = useTwoColumns
-            ? (constraints.maxWidth - 12) / 2
-            : constraints.maxWidth;
+class _GameCard extends StatefulWidget {
+  final String icon;
+  final String title;
+  final String subtitle;
+  final String actionText;
+  final List<Color> gradientColors;
+  final Animation<double> entrance;
+  final VoidCallback onTap;
 
-        return Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: games.map((g) {
-            return SizedBox(
-              width: cardWidth,
-              child: GestureDetector(
-                onTap: () => _navigateToGame(g['screen'] as Widget),
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: g['colors'] as List<Color>,
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: (g['colors'] as List<Color>)[0].withOpacity(0.3),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Text(
-                        g['icon'] as String,
-                        style: const TextStyle(fontSize: 32),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              g['title'] as String,
-                              style: GoogleFonts.poppins(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            Text(
-                              g['sub'] as String,
-                              style: GoogleFonts.poppins(
-                                fontSize: 12,
-                                color: Colors.white.withOpacity(0.85),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Icon(
-                        Icons.arrow_forward_ios,
-                        color: Colors.white70,
-                        size: 18,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
+  const _GameCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.actionText,
+    required this.gradientColors,
+    required this.entrance,
+    required this.onTap,
+  });
+
+  @override
+  State<_GameCard> createState() => _GameCardState();
+}
+
+class _GameCardState extends State<_GameCard> {
+  bool _hovered = false;
+  bool _pressed = false;
+
+  bool get _active => _hovered || _pressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: widget.entrance,
+      builder: (_, child) {
+        final v = widget.entrance.value;
+        return Opacity(
+          opacity: v.clamp(0.0, 1.0),
+          child: Transform.translate(
+            offset: Offset(0, 28 * (1 - v)),
+            child: child,
+          ),
         );
       },
-    );
-  }
-
-  // ─── REWARDS Section ───
-  Widget _buildRewardsSection() {
-    final allRewards = [
-      {'icon': '🏅', 'name': 'First Game', 'need': 'Play 1 game'},
-      {'icon': '⭐', 'name': 'Trivia Master', 'need': 'Play 3 games'},
-      {'icon': '🎉', 'name': 'Game Champion', 'need': 'Play all 4 games'},
-    ];
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: AppTheme.birthdayPurpleLight.withOpacity(0.3),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Games played: $_gamesPlayed',
-            style: GoogleFonts.poppins(fontSize: 14, color: Colors.white70),
-          ),
-          const SizedBox(height: 14),
-          ...allRewards.map((r) {
-            final unlocked = _unlockedRewards.contains(
-              '${r['icon']} ${r['name']}',
-            );
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Row(
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: widget.onTap,
+          onTapDown: (_) => setState(() => _pressed = true),
+          onTapUp: (_) => setState(() => _pressed = false),
+          onTapCancel: () => setState(() => _pressed = false),
+          child: AnimatedScale(
+            scale: _active ? 1.035 : 1.0,
+            duration: const Duration(milliseconds: 150),
+            curve: Curves.easeOut,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              curve: Curves.easeOut,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: widget.gradientColors,
+                ),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color:
+                      _active
+                          ? Colors.white.withOpacity(0.45)
+                          : Colors.white.withOpacity(0.1),
+                  width: _active ? 1.5 : 1.0,
+                ),
+                // Static shadow — never interpolated, no per-frame shadow cost
+                boxShadow: [
+                  BoxShadow(
+                    color: widget.gradientColors[0].withOpacity(0.35),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    width: 44,
-                    height: 44,
+                    width: 50,
+                    height: 50,
                     decoration: BoxDecoration(
-                      color: unlocked
-                          ? AppTheme.birthdayOrangePrimary.withOpacity(0.3)
-                          : Colors.white.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.white.withOpacity(0.18),
+                      borderRadius: BorderRadius.circular(14),
                     ),
-                    child: Center(
-                      child: Text(
-                        unlocked ? r['icon']! : '🔒',
-                        style: const TextStyle(fontSize: 22),
-                      ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      widget.icon,
+                      style: const TextStyle(fontSize: 26),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  const Spacer(),
+                  Text(
+                    widget.title,
+                    style: GoogleFonts.poppins(
+                      fontSize: 19,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    widget.subtitle,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.poppins(
+                      fontSize: 12.5,
+                      color: Colors.white.withOpacity(0.72),
+                      height: 1.4,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 150),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(_active ? 0.28 : 0.14),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          r['name']!,
-                          style: GoogleFonts.poppins(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: unlocked ? Colors.white : Colors.white54,
-                          ),
-                        ),
-                        Text(
-                          unlocked ? 'Unlocked! 🎉' : r['need']!,
+                          widget.actionText,
                           style: GoogleFonts.poppins(
                             fontSize: 12,
-                            color: unlocked
-                                ? AppTheme.birthdayTextAccent
-                                : Colors.white38,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                            letterSpacing: 0.6,
                           ),
+                        ),
+                        const SizedBox(width: 6),
+                        const Icon(
+                          Icons.arrow_forward_rounded,
+                          color: Colors.white,
+                          size: 13,
                         ),
                       ],
                     ),
                   ),
-                  if (unlocked)
-                    const Icon(
-                      Icons.check_circle,
-                      color: AppTheme.birthdayTextAccent,
-                      size: 22,
-                    ),
                 ],
               ),
-            );
-          }),
-        ],
+            ),
+          ),
+        ),
       ),
     );
   }
 }
 
-// ─── Wheel Painter ───
-class WheelPainter extends CustomPainter {
-  final List<Map<String, String>> items;
-  WheelPainter(this.items);
+// ─── Confetti Painter ─────────────────────────────────────────────────────────
 
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width / 2;
-    final segAngle = 2 * pi / items.length;
-    final paint = Paint()..style = PaintingStyle.fill;
-
-    for (int i = 0; i < items.length; i++) {
-      paint.color = i % 2 == 0
-          ? AppTheme.birthdayPurplePrimary
-          : AppTheme.birthdayOrangePrimary;
-      canvas.drawArc(
-        Rect.fromCircle(center: center, radius: radius),
-        i * segAngle - pi / 2,
-        segAngle,
-        true,
-        paint,
-      );
-
-      // Draw segment border
-      canvas.drawArc(
-        Rect.fromCircle(center: center, radius: radius),
-        i * segAngle - pi / 2,
-        segAngle,
-        true,
-        Paint()
-          ..style = PaintingStyle.stroke
-          ..color = Colors.white.withOpacity(0.3)
-          ..strokeWidth = 1.5,
-      );
-    }
-
-    // Center circle
-    canvas.drawCircle(center, 16, Paint()..color = Colors.white);
-    canvas.drawCircle(
-      center,
-      8,
-      Paint()..color = AppTheme.birthdayOrangePrimary,
-    );
-
-    // Arrow/indicator at top
-    final arrowPaint = Paint()..color = Colors.white;
-    final arrowPath = Path()
-      ..moveTo(center.dx - 10, 0)
-      ..lineTo(center.dx + 10, 0)
-      ..lineTo(center.dx, 18)
-      ..close();
-    canvas.drawPath(arrowPath, arrowPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-// ─── Confetti Painter ───
 class BirthdayConfettiPainter extends CustomPainter {
   final double animationValue;
   BirthdayConfettiPainter(this.animationValue);
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..style = PaintingStyle.fill;
+    final rng = Random(42);
     final colors = [
       AppTheme.birthdayPurpleLight,
       AppTheme.birthdayOrangeLight,
       AppTheme.birthdayTextAccent,
-      Colors.white.withOpacity(0.7),
+      Colors.white.withOpacity(0.6),
+      const Color(0xFFFFB3C1),
     ];
 
-    for (int i = 0; i < 30; i++) {
-      final offsetX = (i % 8) * (size.width / 8) + 10;
-      final progress = (animationValue + (i * 0.12)) % 1.0;
-      final y = progress * size.height * 1.2;
-      final sway = 15.0 * (i % 3 - 1) * (1 - progress);
+    for (int i = 0; i < 22; i++) {
+      final offsetX = (i % 11) * (size.width / 11) + rng.nextDouble() * 10;
+      final progress = (animationValue + (i * 0.09)) % 1.0;
+      final y = progress * size.height * 1.15 - 10;
+      final sway = 14.0 * sin(progress * pi * 2 + i);
       final x = offsetX + sway;
+      final rotation = progress * pi * 4 + i;
 
-      paint.color = colors[i % colors.length];
+      final paint = Paint()..color = colors[i % colors.length];
 
-      if (i % 3 == 0) {
-        canvas.drawCircle(Offset(x, y), 2.5, paint);
+      canvas.save();
+      canvas.translate(x, y);
+      canvas.rotate(rotation);
+
+      if (i % 4 == 0) {
+        canvas.drawCircle(Offset.zero, 3, paint);
+      } else if (i % 4 == 1) {
+        canvas.drawRect(const Rect.fromLTWH(-3, -3, 6, 6), paint);
+      } else if (i % 4 == 2) {
+        canvas.drawRect(const Rect.fromLTWH(-1, -5, 2, 10), paint);
       } else {
-        canvas.drawRect(
-          Rect.fromCenter(center: Offset(x, y), width: 5, height: 5),
-          paint,
-        );
+        final path =
+            Path()
+              ..moveTo(0, -4)
+              ..lineTo(3, 0)
+              ..lineTo(0, 4)
+              ..lineTo(-3, 0)
+              ..close();
+        canvas.drawPath(path, paint);
       }
+
+      canvas.restore();
     }
   }
 
   @override
-  bool shouldRepaint(BirthdayConfettiPainter oldDelegate) => true;
+  bool shouldRepaint(BirthdayConfettiPainter old) =>
+      old.animationValue != animationValue;
 }
+
