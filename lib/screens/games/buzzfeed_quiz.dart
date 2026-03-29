@@ -149,7 +149,7 @@ class _TenThingsScreenState extends State<TenThingsScreen>
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'a love letter, in 10 parts',
+                      'a few praises for you. You know, to boost your ego a little (ok, a lot) but it\'s your birthday so all is forgiven.',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
                         fontSize: 13,

@@ -61,8 +61,8 @@ class _GameIntroScreenState extends State<GameIntroScreen>
       // Hold — first phase is shorter, last is longer for emphasis
       final holdMs =
           i == 0
-              ? 1400
-              : (i == widget.phases.length - 1 ? 2200 : 1800);
+              ? 2000
+              : (i == widget.phases.length - 1 ? 3500 : 2800);
       await Future.delayed(Duration(milliseconds: holdMs));
       if (!mounted) return;
 
@@ -267,19 +267,17 @@ class _GameIntroScreenState extends State<GameIntroScreen>
                 : isLast
                 ? FontWeight.w600
                 : FontWeight.w400,
-        color:
-            isLast
-                ? widget.accentColor.withOpacity(0.95)
-                : Colors.white.withOpacity(isFirst ? 1.0 : 0.88),
+        color: Colors.white,
         height: 1.6,
         letterSpacing: isFirst ? 0.8 : 0.3,
         shadows: [
           Shadow(
-            color:
-                isLast
-                    ? widget.accentColor.withOpacity(0.6)
-                    : AppTheme.birthdayPurplePrimary.withOpacity(0.5),
-            blurRadius: isLast ? 28 : 18,
+            color: widget.accentColor.withOpacity(0.9),
+            blurRadius: isLast ? 40 : 28,
+          ),
+          Shadow(
+            color: widget.accentColor.withOpacity(0.5),
+            blurRadius: isLast ? 80 : 55,
           ),
         ],
       ),

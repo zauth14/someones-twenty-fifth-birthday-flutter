@@ -336,7 +336,6 @@ class _BirthdayModeScreenState extends State<BirthdayModeScreen>
     );
   }
 
-  // Placeholder intro phases — fill these in with your own words!
   static const _introPhases = [
     // 0 – 10 Things
     [
@@ -365,8 +364,8 @@ class _BirthdayModeScreenState extends State<BirthdayModeScreen>
     // 4 – Link Game
     [
       'everything is connected.',
-      'some more obviously than others.',
-      'good luck.',
+      'some more obviously than others (wink wink).',
+      'enjoy your favourite online game with a typo in the title due to copyright issues :)',
     ],
     // 5 – Quiz Time
     [

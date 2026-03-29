@@ -21,8 +21,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   bool _navigating = false;
 
   static const _messages = [
-    'hi there, stranger',
-    'if you think I took this time to curate\nsomething specifically for you...',
+    'Hi there, stranger',
+    'If you think I took this time to curate\nsomething specifically for you...',
     '...you\'re wrong.\ni just love sidequesting',
     '...and building stuff...',
     '...and maaaybe also you (a little bit)',
