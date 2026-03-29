@@ -68,7 +68,7 @@ const _songs = [
     lyrics:
         'Come along with me and don\'t be scared\n'
         'I just wanna set you free, come on come on come on\n'
-        'You and me can make it up anyway\n'
+        'You and me can make it anywhere\n'
         'For now we can stay here for a while\n\n'
         'Cause you know, I just wanna see you smile\n'
         'No matter where you go, you know you\'re not alone\n'
