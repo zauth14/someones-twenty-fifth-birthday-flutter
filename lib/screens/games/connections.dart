@@ -16,47 +16,23 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
     {
       'groups': [
         {
-          'name': 'Fruits',
-          'items': ['APPLE', 'BANANA', 'CHERRY', 'GRAPE'],
+          'name': 'Siddhant\'s Fav Music Genres',
+          'items': ['TECHNO', 'EDM', 'RAP', 'HIPHOP'],
           'color': const Color(0xFFFBC02D),
         },
         {
-          'name': 'Planets',
-          'items': ['MARS', 'VENUS', 'SATURN', 'PLUTO'],
+          'name': 'Siddhant\'s Not So Guilty Pleasures',
+          'items': ['ROASTING (ME)', 'SIDEQUESTING', 'BINGE-WATCHING', 'RAVES'],
           'color': const Color(0xFF66BB6A),
         },
         {
-          'name': 'Colors',
-          'items': ['SCARLET', 'INDIGO', 'AMBER', 'IVORY'],
+          'name': 'My Birthday Wish',
+          'items': ['HAPPY', 'BIRTHDAY', 'CUTIE', 'PIE'],
           'color': const Color(0xFF42A5F5),
         },
         {
-          'name': 'Card Games',
-          'items': ['POKER', 'BRIDGE', 'HEARTS', 'SPADES'],
-          'color': const Color(0xFFAB47BC),
-        },
-      ],
-    },
-    {
-      'groups': [
-        {
-          'name': 'Dog Breeds',
-          'items': ['POODLE', 'BEAGLE', 'HUSKY', 'CORGI'],
-          'color': const Color(0xFFFBC02D),
-        },
-        {
-          'name': 'Instruments',
-          'items': ['PIANO', 'VIOLIN', 'DRUMS', 'FLUTE'],
-          'color': const Color(0xFF66BB6A),
-        },
-        {
-          'name': 'Weather',
-          'items': ['STORM', 'BREEZE', 'FROST', 'HAIL'],
-          'color': const Color(0xFF42A5F5),
-        },
-        {
-          'name': 'Dances',
-          'items': ['WALTZ', 'SALSA', 'TANGO', 'SWING'],
+          'name': 'What Makes Siddhant Adorable',
+          'items': ['HUGGABLE', 'PASSIONATE', 'CHARISMA', 'HUMOR'],
           'color': const Color(0xFFAB47BC),
         },
       ],
@@ -65,22 +41,22 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
       'groups': [
         {
           'name': 'Gems',
-          'items': ['RUBY', 'PEARL', 'OPAL', 'TOPAZ'],
+          'items': ['RUBY', 'PEARL', 'OPAL', 'SIDDHANT'],
           'color': const Color(0xFFFBC02D),
         },
         {
-          'name': 'Trees',
-          'items': ['MAPLE', 'CEDAR', 'BIRCH', 'WILLOW'],
+          'name': 'Siddhant\'s Fav (trade mark) Words',
+          'items': ['DAMN', 'SORT', 'PERFECT', 'BOOBS'],
           'color': const Color(0xFF66BB6A),
         },
         {
-          'name': 'Pasta',
-          'items': ['PENNE', 'ORZO', 'ROTINI', 'ZITI'],
+          'name': 'Siddhant\'s Weaknesses',
+          'items': ['CHEESECAKE', 'SLEEP', 'ME', 'PARTIES'],
           'color': const Color(0xFF42A5F5),
         },
         {
-          'name': 'Fabrics',
-          'items': ['SILK', 'DENIM', 'LINEN', 'SUEDE'],
+          'name': 'Phrase I\'d Use to Describe Siddhant',
+          'items': ['SILLY', 'GOOSE', 'MY', 'CUTIE'],
           'color': const Color(0xFFAB47BC),
         },
       ],
@@ -94,15 +70,18 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
   int mistakesLeft = 4;
   bool gameWon = false;
   bool gameLost = false;
+  int _currentPuzzleIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    _initializeGame();
+    _currentPuzzleIndex = Random().nextInt(puzzles.length);
+    _initializeGame(_currentPuzzleIndex);
   }
 
-  void _initializeGame() {
-    final puzzle = puzzles[Random().nextInt(puzzles.length)];
+  void _initializeGame(int puzzleIndex) {
+    _currentPuzzleIndex = puzzleIndex;
+    final puzzle = puzzles[puzzleIndex];
     currentGroups = List<Map<String, dynamic>>.from(
       (puzzle['groups'] as List).map((g) => Map<String, dynamic>.from(g)),
     );
@@ -534,7 +513,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                               vertical: 14,
                             ),
                           ),
-                          onPressed: () => setState(_initializeGame),
+                          onPressed: () => setState(() => _initializeGame((_currentPuzzleIndex + 1) % puzzles.length)),
                         ),
                       ],
                     ),
@@ -572,7 +551,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
                               vertical: 14,
                             ),
                           ),
-                          onPressed: () => setState(_initializeGame),
+                          onPressed: () => setState(() => _initializeGame(_currentPuzzleIndex)),
                         ),
                       ],
                     ),

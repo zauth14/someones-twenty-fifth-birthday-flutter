@@ -12,39 +12,39 @@ class WavelengthScreen extends StatefulWidget {
 class _WavelengthScreenState extends State<WavelengthScreen> {
   final List<Map<String, dynamic>> prompts = [
     {
-      'left': 'Hot',
-      'right': 'Cold',
-      'answer': 'Temperature',
-      'hint': 'Temperature',
-      'target': 0.2,
+      'left': 'Adorable',
+      'right': 'Annoying',
+      'answer': 'You bringing up The Tickle Monster',
+      'hint': 'You bringing up The Tickle Monster',
+      'target': 0.0,
     },
     {
       'left': 'Love',
       'right': 'Hate',
-      'answer': 'Emotion',
-      'hint': 'Emotion',
-      'target': 0.8,
-    },
-    {
-      'left': 'Morning',
-      'right': 'Night',
-      'answer': 'Time of Day',
-      'hint': 'Time of Day',
+      'answer': 'When I ask you to prioritize your health and wellbeing but you ignore it and then I have to worry about you and nag you about it',
+      'hint': 'When I ask you to prioritize your health and wellbeing but you ignore it and then I have to worry about you and nag you about it',
       'target': 0.3,
     },
     {
-      'left': 'Fast',
-      'right': 'Slow',
-      'answer': 'Speed',
-      'hint': 'Speed',
-      'target': 0.1,
+      'left': 'Easy',
+      'right': 'Difficult',
+      'answer': 'Me trying to figure you out',
+      'hint': 'Me trying to figure you out',
+      'target': 0.6,
+    },
+    {
+      'left': 'Possible',
+      'right': 'Impossible',
+      'answer': 'You actually fixing your sleep schedule for good',
+      'hint': 'You actually fixing your sleep schedule for good',
+      'target': 0.9,
     },
     {
       'left': 'Happy',
       'right': 'Sad',
-      'answer': 'Mood',
-      'hint': 'Mood',
-      'target': 0.4,
+      'answer': 'The fact that I am not there with you rn',
+      'hint': 'The fact that I am not there with you rn',
+      'target': 1.0,
     },
   ];
 
@@ -208,12 +208,14 @@ class _WavelengthScreenState extends State<WavelengthScreen> {
                           size: 18,
                         ),
                         const SizedBox(width: 8),
-                        Text(
-                          hint,
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontStyle: FontStyle.italic,
-                            color: Colors.white70,
+                        Flexible(
+                          child: Text(
+                            hint,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontStyle: FontStyle.italic,
+                              color: Colors.white70,
+                            ),
                           ),
                         ),
                       ],
@@ -228,45 +230,52 @@ class _WavelengthScreenState extends State<WavelengthScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: accentRose.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: accentRose.withOpacity(0.4),
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
                           ),
-                        ),
-                        child: Text(
-                          prompt['left'],
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: accentRose,
+                          decoration: BoxDecoration(
+                            color: accentRose.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: accentRose.withOpacity(0.4),
+                            ),
+                          ),
+                          child: Text(
+                            prompt['left'],
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: accentRose,
+                            ),
                           ),
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: accentOrange.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: accentOrange.withOpacity(0.4),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
                           ),
-                        ),
-                        child: Text(
-                          prompt['right'],
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: accentOrange,
+                          decoration: BoxDecoration(
+                            color: accentOrange.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: accentOrange.withOpacity(0.4),
+                            ),
+                          ),
+                          child: Text(
+                            prompt['right'],
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: accentOrange,
+                            ),
                           ),
                         ),
                       ),

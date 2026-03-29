@@ -27,17 +27,19 @@ class _Song {
 const _songs = [
   _Song(
     emoji: '🌙',
-    title: 'Golden Hour',
-    artist: 'JVKE',
-    note: 'this one\'s basically about you, sorry not sorry',
+    title: 'Late Night Talking',
+    artist: 'Harry Styles',
+    note: 'this one\'s basically about you and your toxic sleep schedule, sorry not sorry',
     lyrics:
-        'I don\'t know how to tell you this\n'
-        'But I\'m kind of into you\n'
-        'And I\'m terrified\n'
-        'Your eyes are like the sunrise\n'
-        'Your touch is like the golden hour\n'
-        'And I don\'t want to let go\n'
-        'Even when the sun goes down',
+        'I\'ve never been a fan of change\n'
+        'But I\'d follow you to any place\n'
+        'If It\'s Hollywood or Bishopsgate, I\'m coming too\n'
+        'If you\'re feeling down I just wanna make you happier baby\n'
+        'Wish I was around I just wanna make you happier baby\n'
+        'We\'ve been doin\' all this late night talking\n'
+        'Bout anything you wanna till the morning\n'
+        'Now you\'re in my life\n'
+        'I can\'t get you off my mind\n',
     c1: Color(0xFF92400E),
     c2: Color(0xFF78350F),
   ),
@@ -45,7 +47,7 @@ const _songs = [
     emoji: '💛',
     title: 'Yellow',
     artist: 'Coldplay',
-    note: 'because everything about you shines',
+    note: 'because everything about you shines...like yellow? idk lol cute song tho.',
     lyrics:
         'Look at the stars\n'
         'Look how they shine for you\n'
@@ -59,51 +61,61 @@ const _songs = [
     c2: Color(0xFFD97706),
   ),
   _Song(
-    emoji: '🌊',
-    title: 'Oceans (Where Feet May Fail)',
-    artist: 'Hillsong United',
-    note: 'the courage you carry quietly',
+    emoji: '📞',
+    title: 'One Call Away',
+    artist: 'Charlie Puth',
+    note: 'yeah, it is cheesy but whatever, it\'s the thought that counts',
     lyrics:
-        'You call me out upon the waters\n'
-        'The great unknown, where feet may fail\n'
-        'And there I find You in the mystery\n'
-        'In oceans deep, my faith will stand\n\n'
-        'Spirit, lead me where my trust is without borders\n'
-        'Let me walk upon the waters\n'
-        'Wherever You would call me',
+        'Come along with me and don\'t be scared\n'
+        'I just wanna set you free, come on come on come on\n'
+        'You and me can make it up anyway\n'
+        'For now we can stay here for a while\n\n'
+        'Cause you know, I just wanna see you smile\n'
+        'No matter where you go, you know you\'re not alone\n'
+        'I\'m only one call away\n'
+        'I\'ll be there to save the day\n'
+        'Superman got nothing on me\n'
+        'I\'m only one call away',
     c1: Color(0xFF1E3A8A),
     c2: Color(0xFF1E40AF),
   ),
   _Song(
-    emoji: '🌹',
-    title: 'Make You Feel My Love',
-    artist: 'Adele',
-    note: 'I mean it, every word',
+    emoji: '🏆',
+    title: 'Super Trouper',
+    artist: 'ABBA',
+    note: 'I mean it, every word. ok, not EVERY word, because I am not actually in Glasgow, but let\'s try and focus on the sentiment here.',
     lyrics:
-        'When the rain is blowing in your face\n'
-        'And the whole world is on your case\n'
-        'I could offer you a warm embrace\n'
-        'To make you feel my love\n\n'
-        'I know you haven\'t made your mind up yet\n'
-        'But I would never do you wrong\n'
-        'I\'ve known it from the moment that we met\n'
-        'No doubt in my mind where you belong',
+        'I was sick and tired of everything\n'
+        'When I called you last night from Glasgow\n'
+        'All I do is eat and sleep and sing\n'
+        'Wishing every show was the last show\n\n'
+        'So imagine I was glad to hear you\'re coming\n'
+        'Suddenly I felt alright\n'
+        'And It\'s gonna be so different when I\'m on the stage tonight\n'
+        'Tonight the Super Trouper lights are gonna find me\n'
+        'Shining like the sun\n'
+        'Smiling, having fun\n'
+        'Feeling like a number one\n'
+        'Tonight the Super Trouper beams are gonna blind me\n'
+        'But I won\'t feel blue\n'
+        'Like I always do\n'
+        'Cause somewhere in the crowd there\'s you\n', 
     c1: Color(0xFF7C3AED),
     c2: Color(0xFF5B21B6),
   ),
   _Song(
     emoji: '✨',
-    title: 'Lucky',
-    artist: 'Jason Mraz & Colbie Caillat',
-    note: 'even from 5845 miles away',
+    title: 'Count on Me',
+    artist: 'Bruno Mars',
+    note: 'not the Bruno Mars song you expected, huh? But, still a cute (and innocent) one hehe.',
     lyrics:
-        'Do you hear me? I\'m talking to you\n'
-        'Across the water, across the deep blue ocean\n'
-        'Under the open sky\n'
-        'Oh my, baby, I\'m trying\n\n'
-        'Lucky I\'m in love with my best friend\n'
-        'Lucky to have been where I have been\n'
-        'Lucky to be coming home again',
+        'You\'ll always have my shoulder when you cry\n'
+        'I\'ll never let go never say goodbye\n'
+        'You can count on me like 1, 2, 3\n'
+        'I\'ll be there\n\n'
+        'And I know when I need it I can count on you like 4, 3, 2\n'
+        'And you\'ll be there\n'
+        'Cause that\'s what friends are supposed to do, oh yeah\n',
     c1: Color(0xFF065F46),
     c2: Color(0xFF047857),
   ),
@@ -256,7 +268,7 @@ class _LyricsScreenState extends State<LyricsScreen>
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Songs for You',
+                    'Songs Lyrics for You',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.poppins(
                       fontSize: isDesktop ? 26 : 22,

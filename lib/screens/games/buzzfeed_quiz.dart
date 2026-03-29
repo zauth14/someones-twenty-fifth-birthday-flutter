@@ -15,15 +15,15 @@ class _TenThingsScreenState extends State<TenThingsScreen>
     with SingleTickerProviderStateMixin {
   final List<String> praises = [
     'You are great at connections. And wavelength. And wordle. And quickly doing Buzzfeed quizzes. And everything you do, really.',
-    'You are the most wholesome, caring, sweetest (and, yes, loveable) person I know.',
+    'You are the most wholesome, caring, sweetest (and, yes, I guess loveable) person I know.',
     'You do SO much for everyone (seriously, how do you have time??), and you never ask for anything in return (well, boobs/sex but we don\'t speak about that).',
     'You always know how to make me laugh, even when I don\'t want to.',
     'You stay true to yourself and your values, dreams, ambitions, and you inspire me to be a better person just by being you.',
     'You light up my life and the lives of everyone around you.',
-    'You are a baddie on the outside, but a softie on the inside (and I love that)',
-    'You make me feel super loved and cared for (even from 5845 miles away)',
-    'You are the life of the party, hyping everyone up and making the feel prioritized and included (even though you are getting older and probably want to just go home and sleep instead).',
-    'You are an ethereal angel and I am so lucky to have you in my life.',
+    'You are a badass on the outside, but a softie on the inside (and I love that)',
+    'You have a cute smile and an even cuter laugh, but the way your face lights up after you roast me (or crack those ridiculous double meaning jokes) is the absolute best.',
+    'You are the life of the party, hyping everyone up and making them feel prioritized and included (even though you are getting older and probably want to just go home and sleep instead).',
+    'You are an ethereal angel and I am so lucky to have you in my life. Oh, and you will have the free pass forever.',
   ];
 
   int currentIndex = 0;

@@ -11,7 +11,10 @@ class QuizTimeScreen extends StatefulWidget {
   State<QuizTimeScreen> createState() => _QuizTimeScreenState();
 }
 
-class _QuizTimeScreenState extends State<QuizTimeScreen> {
+class _QuizTimeScreenState extends State<QuizTimeScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _fadeCtrl;
+  bool _isFading = false;
   // Multiple quizzes — each with questions and a result mapping
   final List<Map<String, dynamic>> quizzes = [
     {
@@ -21,10 +24,10 @@ class _QuizTimeScreenState extends State<QuizTimeScreen> {
         {
           'q': 'Pick a weekend vibe:',
           'options': [
-            'Beach day',
+            'Chill day at home',
             'Movie marathon',
             'Road trip',
-            'Cooking at home',
+            'Going out with friends',
           ],
         },
         {
@@ -33,7 +36,7 @@ class _QuizTimeScreenState extends State<QuizTimeScreen> {
             'Sunset orange',
             'Ocean blue',
             'Forest green',
-            'Berry pink',
+            'Lavender Purple',
           ],
         },
         {
@@ -41,7 +44,7 @@ class _QuizTimeScreenState extends State<QuizTimeScreen> {
           'options': [
             'Iced coffee',
             'Smoothie',
-            'Hot chocolate',
+            'Energy Drink',
             'Sparkling water',
           ],
         },
@@ -51,14 +54,14 @@ class _QuizTimeScreenState extends State<QuizTimeScreen> {
         },
       ],
       'results': [
-        'You\'re a classic Tiramisu — layered, elegant, and unforgettable!',
-        'You\'re a warm Brownie — rich, comforting, and loved by everyone!',
-        'You\'re a colorful Macaron — unique, trendy, and full of surprises!',
-        'You\'re a refreshing Sorbet — vibrant, light, and always uplifting!',
+        'You\'re a New York Style Blueberry Cheesecake — layered, elegant, (kinda fancy) and unforgettable. Smooth at first, but with just the right amount of boldness underneath. Sweet, a little indulgent, and honestly… kind of addictive. The kind of person people keep coming back to without even realizing why.',
+        'You\'re a Tiramisu — complicated, mysterious, and full of depth! You have a rich blend of qualities that keep people intrigued. You can be sweet and comforting, but also have a bold, unexpected side that keeps things interesting. You\'re the person who always has a story to tell and a unique perspective to share.',
+        'You\'re a Birthday Cake (hey, what a coincidence) — unique, trendy, and full of surprises! You have a childlike joy and a colorful personality that lights up any room. You\'re the life of the party, always ready to celebrate and make every moment special. People are drawn to your fun-loving spirit and your ability to make even ordinary days feel like a celebration.',
+        'You\'re a Refreshing Sorbet — vibrant, light, and always uplifting! You have a zest for life and a refreshing outlook that inspires those around you. You\'re the person who brings a burst of energy and positivity wherever you go. People love your ability to brighten their day and your knack for making even the simplest moments feel special.',
       ],
     },
     {
-      'title': 'What\'s Your Party Anthem?',
+      'title': 'What\'s Your Go-To Party Anthem?',
       'emoji': '🎶',
       'questions': [
         {
@@ -89,14 +92,14 @@ class _QuizTimeScreenState extends State<QuizTimeScreen> {
         },
       ],
       'results': [
-        'Your anthem is "Dancing Queen" — you own every dance floor!',
-        'Your anthem is "Good as Hell" — confident and unstoppable!',
-        'Your anthem is "Mr. Brightside" — you bring the energy!',
-        'Your anthem is "Levitating" — smooth, groovy, and magnetic!',
+        'Your anthem is "Dancing Queen" — you own every dance floor! You are the life of the party, always ready to dance and have a good time. Your energy is infectious, and you know how to get everyone moving. You\'re the person who can turn any gathering into a dance party, and people love your carefree spirit and your ability to make everyone feel included.',
+        'Your anthem is "Good as Hell" — confident and unstoppable! You have a powerful presence and a can-do attitude that inspires those around you. You\'re the person who walks into a room and immediately commands attention with your confidence and charisma. Your anthem reflects your ability to overcome challenges and come out on top, no matter what life throws at you.',
+        'Your anthem is "Mr. Brightside" — you bring the energy! You have a passionate and intense personality that shines through in everything you do. You\'re the person who can turn even the most mundane moments into something exciting and memorable. Your anthem reflects your ability to find joy and excitement in the little things, and people are drawn to your vibrant energy.',
+        'Your anthem is "Levitating" — smooth, groovy, and magnetic! You have a cool and effortless vibe that makes people want to be around you. You\'re the person who can make any situation feel fun and lighthearted with your charm and charisma. Your anthem reflects your ability to lift people\'s spirits and create a positive atmosphere wherever you go.',
       ],
     },
     {
-      'title': 'What Kind of Friend Are You?',
+      'title': 'What is Your Best Quality?',
       'emoji': '💛',
       'questions': [
         {
@@ -112,7 +115,7 @@ class _QuizTimeScreenState extends State<QuizTimeScreen> {
           'q': 'Your friend group role:',
           'options': [
             'The planner',
-            'The hype person',
+            'The hype-man',
             'The therapist',
             'The wildcard',
           ],
@@ -137,10 +140,10 @@ class _QuizTimeScreenState extends State<QuizTimeScreen> {
         },
       ],
       'results': [
-        'You\'re The Rock — reliable, strong, and always there!',
-        'You\'re The Hype Machine — you lift everyone\'s spirits!',
-        'You\'re The Sage — wise, caring, and everyone\'s safe space!',
-        'You\'re The Spark — spontaneous, fun, and full of life!',
+        'You\'re The Rock — reliable, strong, and always there! You\'re the person everyone can count on, no matter what. You provide a sense of stability and security that makes your friends feel safe and supported. Your loyalty and dependability are unmatched, and you\'re the one people turn to when they need a shoulder to lean on.',
+        'You\'re The Hype Machine — you lift everyone\'s spirits! You have an infectious energy and a positive outlook that makes people feel good just by being around you. You\'re the one who always knows how to make your friends laugh and feel appreciated. Your enthusiasm and encouragement are like a boost of confidence for everyone in your circle.',
+        'You\'re The Sage — wise, caring, and everyone\'s safe space! You have a deep understanding of people and a compassionate heart that makes you the go-to person for advice and support. You\'re the one who listens without judgment and offers thoughtful insights that help your friends navigate life\'s challenges. Your empathy and wisdom create a sense of comfort and trust that is truly special.',
+        'You\'re The Spark — spontaneous, fun, and full of life! You bring excitement and unpredictability to your friendships, making every moment feel like an adventure. You\'re the one who encourages your friends to step out of their comfort zones and try new things. Your vibrant personality and zest for life make you the friend who keeps things interesting and fun.',
       ],
     },
   ];
@@ -157,6 +160,17 @@ class _QuizTimeScreenState extends State<QuizTimeScreen> {
   void initState() {
     super.initState();
     currentQuiz = quizzes[Random().nextInt(quizzes.length)];
+    _fadeCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 160),
+      value: 1.0,
+    );
+  }
+
+  @override
+  void dispose() {
+    _fadeCtrl.dispose();
+    super.dispose();
   }
 
   void _startQuiz(int index) {
@@ -170,14 +184,17 @@ class _QuizTimeScreenState extends State<QuizTimeScreen> {
     });
   }
 
-  void _answer(int optionIndex) {
+  Future<void> _answer(int optionIndex) async {
+    if (_isFading) return;
+    _isFading = true;
+    await _fadeCtrl.animateTo(0.0, curve: Curves.easeOut);
+    if (!mounted) return;
     setState(() {
       answers.add(optionIndex);
       final questions = currentQuiz['questions'] as List;
       if (currentQuestionIndex < questions.length - 1) {
         currentQuestionIndex++;
       } else {
-        // Calculate result based on most chosen index
         final counts = [0, 0, 0, 0];
         for (final a in answers) {
           counts[a]++;
@@ -189,6 +206,8 @@ class _QuizTimeScreenState extends State<QuizTimeScreen> {
         result = (currentQuiz['results'] as List)[maxIdx];
       }
     });
+    await _fadeCtrl.animateTo(1.0, curve: Curves.easeIn);
+    _isFading = false;
   }
 
   void _resetToMenu() {
@@ -346,53 +365,63 @@ class _QuizTimeScreenState extends State<QuizTimeScreen> {
           ),
           const Spacer(),
 
-          // Question
-          Text(
-            question['q'] as String,
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w800,
-              color: Colors.white,
+          AnimatedBuilder(
+            animation: _fadeCtrl,
+            builder: (_, child) => Opacity(
+              opacity: _fadeCtrl.value,
+              child: child,
             ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 28),
-
-          // Options
-          ...options.asMap().entries.map((entry) {
-            final optIdx = entry.key;
-            final opt = entry.value as String;
-            // Alternate option accent colors
-            final isEven = optIdx % 2 == 0;
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: () => _answer(optIdx),
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(
-                      color: isEven
-                          ? accentOrange.withOpacity(0.5)
-                          : accentGold.withOpacity(0.5),
-                      width: 1.5,
-                    ),
-                    backgroundColor: tileBase.withOpacity(0.6),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    textStyle: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
+            child: Column(
+              children: [
+                // Question
+                Text(
+                  question['q'] as String,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
                   ),
-                  child: Text(opt),
+                  textAlign: TextAlign.center,
                 ),
-              ),
-            );
-          }),
+                const SizedBox(height: 28),
+
+                // Options
+                ...options.asMap().entries.map((entry) {
+                  final optIdx = entry.key;
+                  final opt = entry.value as String;
+                  final isEven = optIdx % 2 == 0;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        onPressed: () => _answer(optIdx),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(
+                            color: isEven
+                                ? accentOrange.withOpacity(0.5)
+                                : accentGold.withOpacity(0.5),
+                            width: 1.5,
+                          ),
+                          backgroundColor: tileBase.withOpacity(0.6),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          textStyle: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        child: Text(opt),
+                      ),
+                    ),
+                  );
+                }),
+              ],
+            ),
+          ),
 
           const Spacer(),
         ],
@@ -401,7 +430,7 @@ class _QuizTimeScreenState extends State<QuizTimeScreen> {
   }
 
   Widget _buildResult(Color accentOrange, Color accentGold, Color tileBase) {
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -431,10 +460,10 @@ class _QuizTimeScreenState extends State<QuizTimeScreen> {
             child: Text(
               result!,
               style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
                 color: Colors.white,
-                height: 1.5,
+                height: 1.6,
               ),
               textAlign: TextAlign.center,
             ),

@@ -172,7 +172,7 @@ class _BirthdayModeScreenState extends State<BirthdayModeScreen>
                       ],
                     ).createShader(bounds),
                 child: Text(
-                  'Happy 25th Birthday, ${UserConfig.birthdayPersonName}!',
+                  'Happy 25th Birthday to My Favorite Person!',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.poppins(
                     fontSize: 34,
@@ -250,48 +250,48 @@ class _BirthdayModeScreenState extends State<BirthdayModeScreen>
   static const _cardDefs = [
     {
       'icon': '💭',
-      'title': '10 Things I (don\'t) Hate about You',
-      'subtitle': 'Yes, this time, I will play along and boost your ego',
+      'title': '10 Things I (Don\'t) Hate about You',
+      'subtitle': 'This is the part where I shower...you...with compliments. Try to stay humble.',
       'action': 'Start',
       'g1': Color(0xFF5B21B6),
       'g2': Color(0xFF3B0D8E),
     },
     {
       'icon': '🎵',
-      'title': 'Songs for You',
-      'subtitle': 'lyrics that remind me of you',
+      'title': 'Song Lyrics that Remind me of You',
+      'subtitle': 'Because I\'m not creative enough to write poetry and recording a cover felt too cringe',
       'action': 'Open',
       'g1': Color(0xFF92400E),
       'g2': Color(0xFF78350F),
     },
     {
       'icon': '🔤',
-      'title': 'Word Puzzle',
-      'subtitle': '5-letter birthday challenge',
+      'title': 'Word(ish)le',
+      'subtitle': 'Because I don\'t want to be sued for calling it Wordle ',
       'action': 'Play',
       'g1': Color(0xFF7C3AED),
       'g2': Color(0xFF5B21B6),
     },
     {
       'icon': '〰️',
-      'title': 'Spectrum',
-      'subtitle': 'guess ${UserConfig.birthdayPersonName}\'s vibe',
+      'title': 'The Spectrum of You',
+      'subtitle': 'My attempt at making a Wavelength-style game, but with worse UI and more inside jokes',
       'action': 'Play',
       'g1': Color(0xFF9333EA),
       'g2': Color(0xFFEA580C),
     },
     {
       'icon': '🔗',
-      'title': 'Link Game',
-      'subtitle': 'find the matching groups',
+      'title': 'Connexions',
+      'subtitle': 'Because I HAD to include your favourites, given that it is YOUR birthday.',
       'action': 'Play',
       'g1': Color(0xFFEA580C),
       'g2': Color(0xFF9333EA),
     },
     {
       'icon': '🧠',
-      'title': 'Quiz Time',
-      'subtitle': 'fun personality quizzes',
+      'title': 'FizzBuzzfeed Quizzes',
+      'subtitle': 'You see what I did there hehehe?',
       'action': 'Play',
       'g1': Color(0xFFF97316),
       'g2': Color(0xFFEA580C),
@@ -342,25 +342,25 @@ class _BirthdayModeScreenState extends State<BirthdayModeScreen>
     [
       'okay so...',
       'you know how I am TERRIBLE at giving you compliments, right?',
-      'this is an attempt to fix that. Don\'t get used to it though.',
+      'this probably won\'t change that, but I tried to be wholesome for once. Don\'t get used to it though.',
     ],
     // 1 – Songs for You
     [
       'music has a way of saying things...',
-      'that words alone can\'t quite capture.',
-      'these songs remind me of you.',
+      'that words alone can\'t quite capture...',
+      '...unless they are swear words. Teehee, jk. These songs remind me of you.',
     ],
     // 2 – Word Puzzle
     [
       '5 letters.',
       '6 tries.',
-      'one of us will walk away humbled.',
+      'Good luck (not that you need it).',
     ],
     // 3 – Spectrum
     [
-      'somewhere on a scale of...',
-      'hot to cold. fast to slow.',
-      'where do you think you land?',
+      'welcome to my personal hell of',
+      'wavelength',
+      'made with a little bit of love and a lot of overthinking',
     ],
     // 4 – Link Game
     [
@@ -371,8 +371,8 @@ class _BirthdayModeScreenState extends State<BirthdayModeScreen>
     // 5 – Quiz Time
     [
       'who are you, really?',
-      'science (or buzzfeed) might have the answer.',
-      'but I DEFINITELY have the answer',
+      'and no, "Trevor Wallace" is not the right answer',
+      'but let\'s find out via these scientifically unproven, random but fun quizzes that I made up in 10 minutes!',
     ],
   ];
 

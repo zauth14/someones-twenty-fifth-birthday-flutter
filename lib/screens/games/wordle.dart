@@ -14,15 +14,15 @@ class WordleScreen extends StatefulWidget {
 class _WordleScreenState extends State<WordleScreen> {
   static const int wordLength = 5;
   static const List<String> wordList = [
-    'PARTY',
-    'HAPPY',
-    'GAMES',
+    'CUTIE',
+    'ADORE',
+    'VALOR',
     'SWEET',
     'DANCE',
     'LIGHT',
     'SHINE',
     'SMILE',
-    'TOAST',
+    'COMFY',
     'CHARM',
   ];
 
