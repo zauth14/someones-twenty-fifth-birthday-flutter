@@ -60,6 +60,7 @@ const _songs = [
     c1: Color(0xFF92400E),
     c2: Color(0xFFD97706),
   ),
+  //lyrics from "Yellow" by Coldplay, personal note is a cheesy attempt at being romantic, but hey, it\'s the thought that counts, right? :P
   _Song(
     emoji: '📞',
     title: 'One Call Away',
